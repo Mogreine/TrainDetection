@@ -4,6 +4,7 @@ import mrcnn.config
 import mrcnn.utils
 from mrcnn.model import MaskRCNN
 from pathlib import Path
+import time
 
 
 # Конфигурация, которую будет использовать библиотека Mask-RCNN.
@@ -36,7 +37,7 @@ MODEL_DIR = "../logs/"
 COCO_MODEL_PATH = "../logs/mask_rcnn_coco.h5"
 
 # Загружаем датасет COCO при необходимости.
-mrcnn.utils.download_trained_weights(COCO_MODEL_PATH)
+# mrcnn.utils.download_trained_weights(COCO_MODEL_PATH)
 
 # Директория с изображениями для обработки.
 IMAGE_DIR = ROOT_DIR + "images"
@@ -57,16 +58,24 @@ parked_car_boxes = None
 video_capture = cv2.VideoCapture(VIDEO_SOURCE)
 
 # Проходимся в цикле по каждому кадру.
+counter = 61
 while video_capture.isOpened():
     success, frame = video_capture.read()
     if not success:
         break
 
+    if counter < 60:
+        counter += 1
+        continue
+    counter = 0
+
     # Конвертируем изображение из цветовой модели BGR (используется OpenCV) в RGB.
     rgb_image = frame[:, :, ::-1]
 
     # Подаём изображение модели Mask R-CNN для получения результата.
+    start_time = time.time()
     results = model.detect([rgb_image], verbose=0)
+    print(f'Time: {time.time() - start_time}')
 
     # Mask R-CNN предполагает, что мы распознаём объекты на множественных изображениях.
     # Мы передали только одно изображение, поэтому извлекаем только первый результат.
