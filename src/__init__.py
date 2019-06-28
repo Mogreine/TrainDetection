@@ -27,23 +27,22 @@ def get_car_boxes(boxes, class_ids):
 
 
 # Корневая директория проекта.
-ROOT_DIR = Path(".")
+ROOT_DIR = "../"
 
 # Директория для сохранения логов и обученной модели.
-MODEL_DIR = ROOT_DIR / "logs"
+MODEL_DIR = "../logs/"
 
 # Локальный путь к файлу с обученными весами.
-COCO_MODEL_PATH = ROOT_DIR / "mask_rcnn_coco.h5"
+COCO_MODEL_PATH = "../logs/mask_rcnn_coco.h5"
 
 # Загружаем датасет COCO при необходимости.
-if not COCO_MODEL_PATH.exists():
-    mrcnn.utils.download_trained_weights(COCO_MODEL_PATH)
+mrcnn.utils.download_trained_weights(COCO_MODEL_PATH)
 
 # Директория с изображениями для обработки.
-IMAGE_DIR = ROOT_DIR / "images"
+IMAGE_DIR = ROOT_DIR + "images"
 
 # Видеофайл или камера для обработки — вставьте значение 0, если нужно использовать камеру, а не видеофайл.
-VIDEO_SOURCE = "test_images/parking.mp4"
+VIDEO_SOURCE = "../data/videos/test_video.mp4"
 
 # Создаём модель Mask-RCNN в режиме вывода.
 model = MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=MaskRCNNConfig())
