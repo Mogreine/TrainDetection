@@ -11,6 +11,7 @@ class FrameCutter:
         self.pic_name = _pic_name
 
     def cut(self, frame_count, x, y, height, width):
+        self.delete_files()
         video_cap = cv2.VideoCapture(self.video_path)
         frame_number = 0
         curr_frame = 0
@@ -34,3 +35,12 @@ class FrameCutter:
             frame_number += 1
         video_cap.release()
         cv2.destroyAllWindows()
+
+    def delete_files(self):
+        for file in os.listdir(self.pics_path):
+            file_path = os.path.join(self.pics_path, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(e)
