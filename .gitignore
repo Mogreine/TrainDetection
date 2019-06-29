@@ -1,3 +1,6 @@
 .idea/*
+.vscode/*
+*jpg
+*png
 *.mp4
 *.h5
