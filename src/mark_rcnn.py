@@ -58,16 +58,10 @@ parked_car_boxes = None
 video_capture = cv2.VideoCapture(VIDEO_SOURCE)
 
 # Проходимся в цикле по каждому кадру.
-counter = 61
 while video_capture.isOpened():
     success, frame = video_capture.read()
     if not success:
         break
-
-    if counter < 60:
-        counter += 1
-        continue
-    counter = 0
 
     # Конвертируем изображение из цветовой модели BGR (используется OpenCV) в RGB.
     rgb_image = frame[:, :, ::-1]
@@ -105,7 +99,7 @@ while video_capture.isOpened():
     cv2.imshow('Video', frame)
 
     # Нажмите 'q', чтобы выйти.
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(25) & 0xFF == ord('q'):
         break
 
 # Очищаем всё после завершения.
