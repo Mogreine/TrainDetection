@@ -30,11 +30,11 @@ class BalloonConfig(Config):
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
-    NAME = "number_plates"
+    NAME = "train_number_plates"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + balloon
@@ -58,7 +58,7 @@ class BalloonDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("number_plates", 1, "train_number_plates")
+        self.add_class("train_number_plates", 1, "train_number_plates")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
@@ -80,7 +80,7 @@ class BalloonDataset(utils.Dataset):
         # }
         # We mostly care about the x and y coordinates of each region
         # Note: In VIA 2.0, regions was changed from a dict to a list.
-        annotations = json.load("data/via/via_export_json.json")
+        annotations = json.load(open("data/via/via_export_json.json"))
         annotations = list(annotations.values())  # don't need the dict keys
 
         # The VIA tool saves images in the JSON even if they don't have any
@@ -127,12 +127,16 @@ class BalloonDataset(utils.Dataset):
         # Convert polygons to a bitmap mask of shape
         # [height, width, instance_count]
         info = self.image_info[image_id]
+        #print(info)
         mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
                         dtype=np.uint8)
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+            print("load_MASK DATA:")
+            #print(i, p)
+            rr, cc = skimage.draw.rectangle((p['x'], p['y']), (p['x'] + p['width'] + 1, p['y'] + p['height'] + 1))
             mask[rr, cc, i] = 1
+            #print(mask[rr, cc, i])
 
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s
