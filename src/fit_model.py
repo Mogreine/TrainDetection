@@ -8,6 +8,8 @@ import numpy as np
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
 from mrcnn.config import Config
 from mrcnn import utils
@@ -48,6 +50,15 @@ class NewDataset(utils.Dataset):
         pass
     
     def image_reference(self, image_id):
+        info = self.image_info[image_id]
         pass
 
-config = DSConfig()
+# config = DSConfig()
+
+# test = NewDataset()
+# file = open("data/via/via_export_coco.json", "r")
+# print(file.read())
+# file.close()
+coco = COCO("data/via/via_export_coco.json")
+test = coco.getCatIds()
+print(test)
