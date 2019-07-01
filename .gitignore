@@ -1,9 +1,7 @@
 .idea/*
 .vscode/*
-src/utils/__pycache__/*
-
+*/__pycache__/*
 *.jpg
 *.png
 *.mp4
 *.h5
-*.jpg

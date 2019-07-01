@@ -3,14 +3,21 @@ import os
 
 
 class FrameCutter:
-    def __init__(self, _video_path='../../data/videos/test_video.mp4',
-                 _pics_path='../../data/images/tmp/',
+    def __init__(self, _video_path='data/videos/test_video.mp4',
+                 _pics_path='data/images/tmp/',
                  _pic_name='pic'):
         self.video_path = _video_path
         self.pics_path = _pics_path
         self.pic_name = _pic_name
 
     def cut(self, frame_count, x, y, height, width):
+        """
+        frame_count 
+        x 
+        y 
+        height 
+        width 
+        """
         video_cap = cv2.VideoCapture(self.video_path)
         frame_number = 0
         curr_frame = 0
