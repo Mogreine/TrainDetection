@@ -31,11 +31,11 @@ class Cutter(object):
             # if flag == 1:
             for i in self.frames:
                 cv2.rectangle(frame, (i.x, i.y), (i.x + i.width, i.y + i.height), (255, 0, 0), 1)
-                #flag = 0
+                # flag = 0
             cv2.imshow('video', frame)
             if cv2.waitKey(1) & 0xFF == ord('s'):
-                #font = cv2.FONT_HERSHEY_SIMPLEX
-                #cv2.putText(frame,'OK',(10,500), font, 4,(0,0,255),2,cv2.LINE_AA)
+                # font = cv2.FONT_HERSHEY_SIMPLEX
+                # cv2.putText(frame,'OK',(10,500), font, 4,(0,0,255),2,cv2.LINE_AA)
                 cv2.imshow('video', frame)
                 for i in self.frames:
                     cut_frame = cut_frame = frame[i.y:i.y + i.height, i.x:i.x + i.width]
@@ -50,10 +50,10 @@ class Cutter(object):
 
 
 if __name__ == "__main__":
-    #frames = [Frame(480, 130, 700, 480)] vid1
-    #frames = [Frame(551, 337, 902 - 551, 603 - 337), Frame(908, 337, 1260 - 908, 603 - 337)] # vid2
+    # frames = [Frame(480, 130, 700, 480)] vid1
+    # frames = [Frame(551, 337, 902 - 551, 603 - 337), Frame(908, 337, 1260 - 908, 603 - 337)] # vid2
     # 710x81
-    #frames = [Frame(710, 81, 1132 - 710, 562 - 81)] # vid3
-    frames = [Frame(135, 51, 594, 532)] # test_vidio
+    # frames = [Frame(710, 81, 1132 - 710, 562 - 81)] # vid3
+    frames = [Frame(135, 51, 594, 532)]  # test_vidio
     cutter = Cutter('data/videos/test_video.mp4', 'data/images/tmp', 'pic', frames)
     cutter.run()

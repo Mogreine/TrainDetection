@@ -96,7 +96,7 @@ def train(model, path_to_dataset):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=30,
+                epochs=20,
                 layers='heads')
 
 
@@ -133,4 +133,4 @@ if __name__ == "__main__":
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
         weights_path = "../logs/weights/val_22.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, "../data/images/val", ["57059636.jpg"])
+        test_on_pics(model, "../data/images/val", ["tt.jpg"])
