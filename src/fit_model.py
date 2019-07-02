@@ -96,7 +96,6 @@ def train(model, path_to_dataset):
                 epochs=30,
                 layers='heads')
 
-
 def test_on_pics(model, path_to_pics, pics):
     for pic in pics:
         image = skimage.io.imread(os.path.join(path_to_pics, pic))
