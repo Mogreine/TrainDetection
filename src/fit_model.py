@@ -66,7 +66,10 @@ class PlateDataset(utils.Dataset):
             # Get indexes of pixels inside the polygon and set them to 1
             # print("load_MASK DATA:")
             # print(i, p)
-            rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
+            if p['name'] == 'polygon':
+                rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])    
+            else:
+                rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
             mask[rr, cc, i] = 1
             # print(mask[rr, cc, i])
         return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
