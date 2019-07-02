@@ -65,8 +65,8 @@ class PlateDataset(utils.Dataset):
                         dtype=np.uint8)
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
-            #print("load_MASK DATA:")
-            #print(i, p)
+            # print("load_MASK DATA:")
+            # print(i, p)
             rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
             mask[rr, cc, i] = 1
             # print(mask[rr, cc, i])
@@ -123,8 +123,6 @@ if __name__ == "__main__":
             # Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
-
-
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
         weights_path = "../logs/weights/mask_rcnn_train_number_plates_0007.h5"
