@@ -132,9 +132,9 @@ class BalloonDataset(utils.Dataset):
                         dtype=np.uint8)
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
-            print("load_MASK DATA:")
+            #print("load_MASK DATA:")
             #print(i, p)
-            rr, cc = skimage.draw.rectangle((p['x'], p['y']), (p['x'] + p['width'] + 1, p['y'] + p['height'] + 1))
+            rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
             mask[rr, cc, i] = 1
             #print(mask[rr, cc, i])
 
