@@ -130,4 +130,4 @@ if __name__ == "__main__":
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
         weights_path = "../logs/weights/mask_rcnn_train_number_plates_0007.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, "../data/images/new_pics", ["5.jpg"])
+        test_on_pics(model, "../data/images/val", ["5.jpg"])
