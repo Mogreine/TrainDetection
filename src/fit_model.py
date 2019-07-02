@@ -11,18 +11,11 @@ sys.path.append(ROOT_DIR)
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import visualize
-<<<<<<< HEAD
-
-COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-NOMEROFF_NET_WEIGHTS_PATH = os.path.join(ROOT_DIR, "nomeroff_net.h5")
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-=======
 
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "logs/mask_rcnn_coco.h5")
 NOMEROFF_NET_WEIGHTS_PATH = os.path.join(ROOT_DIR, "logs/nomeroff_net.h5")
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs/")
 
->>>>>>> da1743958cbd7785985e6fed06312feca2d63114
 
 
 class PlateConfig(Config):
@@ -72,13 +65,8 @@ class PlateDataset(utils.Dataset):
                         dtype=np.uint8)
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
-<<<<<<< HEAD
             #print("load_MASK DATA:")
             #print(i, p)
-=======
-            # print("load_MASK DATA:")
-            # print(i, p)
->>>>>>> da1743958cbd7785985e6fed06312feca2d63114
             rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
             mask[rr, cc, i] = 1
             # print(mask[rr, cc, i])
@@ -109,8 +97,8 @@ def train(model, path_to_dataset):
                 epochs=30,
                 layers='heads')
     
+
 def test_on_pics(model, path_to_pics, pics):
-    
     for pic in pics:
         image = skimage.io.imread(os.path.join(path_to_pics, pic))
         results = model.detect([image], verbose = 1)
@@ -118,32 +106,7 @@ def test_on_pics(model, path_to_pics, pics):
         visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'], r['scores'])
 
 
-
-
-def test_on_pics(model, path_to_pics, pics):
-    for pic in pics:
-        image = skimage.io.imread(os.path.join(path_to_pics, pic))
-        results = model.detect([image], verbose=1)
-        r = results[0]
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'],
-                                    r['scores'])
-
-
 if __name__ == "__main__":
-
-<<<<<<< HEAD
-    MODE = "eval" # eval or train
-    assert MODE in ["eval", "train"]
-    if MODE == "train":
-        config = PlateConfig()
-        model = modellib.MaskRCNN(mode = "training", config = config, model_dir = DEFAULT_LOGS_DIR)
-        weights_path = COCO_WEIGHTS_PATH
-        model.load_weights(weights_path, by_name=True, exclude=[
-                "mrcnn_class_logits", "mrcnn_bbox_fc",
-                "mrcnn_bbox", "mrcnn_mask"])
-        #model.load_weights(weights_path, by_name=True)
-        train(model, "data/images")
-=======
     MODE = "eval"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
@@ -155,19 +118,11 @@ if __name__ == "__main__":
             "mrcnn_bbox", "mrcnn_mask"])
         # model.load_weights(weights_path, by_name=True)
         train(model, "../data/images")
->>>>>>> da1743958cbd7785985e6fed06312feca2d63114
     else:
         class EvalConfig(PlateConfig):
             # Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
-<<<<<<< HEAD
-        config = EvalConfig()
-        model = modellib.MaskRCNN(mode = "inference", config = config, model_dir = DEFAULT_LOGS_DIR)
-        weights_path = "logs/train_number_plates20190702T0903/mask_rcnn_train_number_plates_0030.h5"
-        model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, "data/images/new_pics", ["5.jpg"])
-=======
 
 
         config = EvalConfig()
@@ -175,4 +130,3 @@ if __name__ == "__main__":
         weights_path = "../logs/weights/mask_rcnn_train_number_plates_0007.h5"
         model.load_weights(weights_path, by_name=True)
         test_on_pics(model, "../data/images/new_pics", ["5.jpg"])
->>>>>>> da1743958cbd7785985e6fed06312feca2d63114
