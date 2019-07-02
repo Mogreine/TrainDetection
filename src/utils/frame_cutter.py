@@ -3,8 +3,8 @@ import os
 
 
 class FrameCutter:
-    def __init__(self, _video_path='../../data/videos/test_video.mp4',
-                 _pics_path='../../data/images/tmp/',
+    def __init__(self, _video_path='data/videos/test_video.mp4',
+                 _pics_path='data/images/tmp/',
                  _pic_name='pic'):
         self.video_path = _video_path
         self.pics_path = _pics_path
