@@ -17,7 +17,6 @@ NOMEROFF_NET_WEIGHTS_PATH = os.path.join(ROOT_DIR, "logs/nomeroff_net.h5")
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs/")
 
 
-
 class PlateConfig(Config):
     NAME = "train_number_plates"
     IMAGES_PER_GPU = 1
@@ -96,16 +95,15 @@ def train(model, path_to_dataset):
                 learning_rate=config.LEARNING_RATE,
                 epochs=30,
                 layers='heads')
-    
+
+
 def test_on_pics(model, path_to_pics, pics):
-    
     for pic in pics:
         image = skimage.io.imread(os.path.join(path_to_pics, pic))
-        results = model.detect([image], verbose = 1)
+        results = model.detect([image], verbose=1)
         r = results[0]
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'], r['scores'])
-
-
+        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'],
+                                    r['scores'])
 
 
 def test_on_pics(model, path_to_pics, pics):
@@ -119,12 +117,12 @@ def test_on_pics(model, path_to_pics, pics):
 
 if __name__ == "__main__":
 
-    MODE = "eval"  # eval or train
+    MODE = "train"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = PlateConfig()
         model = modellib.MaskRCNN(mode="training", config=config, model_dir=DEFAULT_LOGS_DIR)
-        weights_path = COCO_WEIGHTS_PATH
+        weights_path = NOMEROFF_NET_WEIGHTS_PATH
         model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
@@ -135,6 +133,8 @@ if __name__ == "__main__":
             # Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
+
+
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
         weights_path = "../logs/weights/mask_rcnn_train_number_plates_0007.h5"
