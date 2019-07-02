@@ -24,16 +24,16 @@ class PlateConfig(Config):
     STEPS_PER_EPOCH = 100
     IMAGE_MIN_DIM = 128
     IMAGE_MAX_DIM = 1024
-    DETECTION_MIN_CONFIDENCE = 0.7
+    DETECTION_MIN_CONFIDENCE = 0.8
 
 
 class PlateDataset(utils.Dataset):
 
-    def load_plates(self, dataset_dir, subset):
+    def load_plates(self, dataset_dir, subset, annotations_path):
         self.add_class("train_number_plates", 1, "train_number_plates")
         assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
-        annotations = json.load(open("../data/via/via_export_json.json"))
+        annotations = json.load(open(annotations_path))
         annotations = list(annotations.values())  # don't need the dict keys
         annotations = [a for a in annotations if a['regions']]
 
@@ -82,12 +82,12 @@ class PlateDataset(utils.Dataset):
 def train(model, path_to_dataset):
     # Training dataset
     dataset_train = PlateDataset()
-    dataset_train.load_plates(path_to_dataset, "train")
+    dataset_train.load_plates(path_to_dataset, "train", '../data/via/new/train_plates_rect.json')
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = PlateDataset()
-    dataset_val.load_plates(path_to_dataset, "val")
+    dataset_val.load_plates(path_to_dataset, "val", '../data/via/new/test_plates_rect.json')
     dataset_val.prepare()
 
     print("Training network heads")
@@ -95,14 +95,6 @@ def train(model, path_to_dataset):
                 learning_rate=config.LEARNING_RATE,
                 epochs=30,
                 layers='heads')
-
-def test_on_pics(model, path_to_pics, pics):
-    for pic in pics:
-        image = skimage.io.imread(os.path.join(path_to_pics, pic))
-        results = model.detect([image], verbose=1)
-        r = results[0]
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'],
-                                    r['scores'])
 
 
 def test_on_pics(model, path_to_pics, pics):
