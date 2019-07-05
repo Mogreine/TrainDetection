@@ -5,21 +5,20 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 class Rectangle(object):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width = None, height = None, x2 = None, y2 = None):
+        assert width != None and height != None or x2 != None and y2 != None
         self.lu_x = x
         self.lu_y = y
-        self.width = width
-        self.height = height
-        self.rd_x = x + width
-        self.rd_y = y + height
-
-    def __init(self, x1, y1, x2, y2):
-        self.lu_x = x1
-        self.lu_y = y1
-        self.width = x2 - x1
-        self.height = y2 - y1
-        self.rd_x = x2
-        self.rd_y = y2
+        if width == None:
+            self.width = x2 - x
+            self.height = y2 - y
+            self.rd_x = x2
+            self.rd_y = y2
+        else:
+            self.width = width
+            self.height = height
+            self.rd_x = x + width
+            self.rd_y = y + height
 
     def get_points(self):
         return self.lu_x, self.lu_y, self.rd_x, self.rd_y
