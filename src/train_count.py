@@ -73,7 +73,6 @@ class TrainCounter(object):
         cv2.destroyAllWindows()
 
     def meanshift(self, rect: Rectangle):
-<<<<<<< HEAD
         capture = cv2.VideoCapture(self.path_to_video)
         ret, frame = capture.read()
         track_window = rect.get_with_params()
@@ -109,50 +108,7 @@ class TrainCounter(object):
         capture.release()
         cv2.destroyAllWindows()
 
-
+        
 if __name__ == "__main__":
-<<<<<<< HEAD
-    tc = TrainCounter('../data/videos/v1.mp4')
-    tc.meanshift(Rectangle(600, 400, width=100, height=100))
-    # foo('data/videos/test_video.mp4')
-=======
     tc = TrainCounter('data/videos/test_video.mp4') # path to video
     tc.meanshift(Rectangle(600, 400, width=100, height=100)) # set rectangle
->>>>>>> refactored train_count.py: deleted extra code
-=======
-        pass
-
-def foo2(x):
-    print(x)
-
-
-def foo(path):
-    capture = cv2.VideoCapture(path)
-    cv2.namedWindow("FRAME")
-    cv2.createTrackbar("track", "FRAME", 0, int(capture.get(cv2.CAP_PROP_FRAME_COUNT)), foo2)
-    is_pause = False
-    while capture.isOpened():
-        if not is_pause:
-            res, frame = capture.read()
-        if not res:
-            break
-        #frame = cv2.Canny(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 60, 120)
-        cv2.imshow("FRAME", frame)
-        
-        if cv2.waitKey(1) & 0xFF == ord('p'):
-            if is_pause:
-                is_pause = False
-            else:
-                is_pause = True
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    capture.release()
-    cv2.destroyAllWindows()
-    
-
-if __name__ == "__main__":
-    tc = TrainCounter('data/videos/test_video.mp4')
-    tc.camshift(Rectangle(600, 400, width = 100, height = 100))
-    # foo('data/videos/test_video.mp4')
->>>>>>> add train counter
