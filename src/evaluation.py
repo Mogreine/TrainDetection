@@ -11,18 +11,18 @@ import src.fit_model as fit_model
 
 ROOT_DIR = "../"
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs/")
-WEIGHTS_PATH = "../logs/with_aug.h5"
+WEIGHTS_PATH = "../logs/weights/val_22.h5"
 
 
 class Evaluator(object):
     def __init__(self, model, path_to_dataset, path_to_ann):
         self.model = model
         self.dataset_val = fit_model.PlateDataset()
-        self.dataset_val.load_plates(path_to_dataset, "val", path_to_ann)
+        self.dataset_val.load_plates(path_to_dataset, "all_pics", path_to_ann)
         self.dataset_val.prepare()
 
     def eval(self, config):
-        image_ids = np.random.choice(self.dataset_val.image_ids, 10)
+        image_ids = self.dataset_val.image_ids
         APs = []
         for image_id in image_ids:
             image, image_meta, gt_class_id, gt_bbox, gt_mask = \
@@ -48,5 +48,5 @@ if __name__ == "__main__":
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
     model.load_weights(WEIGHTS_PATH, by_name=True)
 
-    eval = Evaluator(model, '../data/images/all_pics/', '../data/via/ann.h5')
+    eval = Evaluator(model, '../data/images/', '../data/via/via_export_json.json')
     eval.eval(config)
