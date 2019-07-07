@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-import datetime
+import matplotlib.pyplot as plt
 import numpy as np
 import skimage.draw
 
@@ -31,7 +31,7 @@ class PlateDataset(utils.Dataset):
 
     def load_plates(self, dataset_dir, subset, annotations_path):
         self.add_class("train_number_plates", 1, "train_number_plates")
-        assert subset in ["train", "val"]
+        # assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
         annotations = json.load(open(annotations_path))
         annotations = list(annotations.values())  # don't need the dict keys
@@ -67,7 +67,7 @@ class PlateDataset(utils.Dataset):
             # print("load_MASK DATA:")
             # print(i, p)
             if p['name'] == 'polygon':
-                rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])    
+                rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
             else:
                 rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
             mask[rr, cc, i] = 1
@@ -85,19 +85,19 @@ class PlateDataset(utils.Dataset):
 def train(model, path_to_dataset):
     # Training dataset
     dataset_train = PlateDataset()
-    dataset_train.load_plates(path_to_dataset, "train", '../data/via/new/train_plates_rect.json')
+    dataset_train.load_plates(path_to_dataset, "aug_all", '../data/via/ann.json')
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = PlateDataset()
-    dataset_val.load_plates(path_to_dataset, "val", '../data/via/new/test_plates_rect.json')
+    dataset_val.load_plates(path_to_dataset, "all_pics", '../data/via/via_export_json.json')
     dataset_val.prepare()
 
     print("Training network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=20,
-                layers='heads')
+    logs = model.train(dataset_train, dataset_val,
+                       learning_rate=config.LEARNING_RATE,
+                       epochs=5,
+                       layers='heads')
 
 
 def test_on_pics(model, path_to_pics, pics):
@@ -131,6 +131,6 @@ if __name__ == "__main__":
 
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
-        weights_path = "../logs/weights/val_22.h5"
+        weights_path = "../logs/with_aug.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, "../data/images/val", ["tt.jpg"])
+        test_on_pics(model, "../data/images/all_pics", ["52026226.jpg"])
