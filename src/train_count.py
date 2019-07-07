@@ -83,11 +83,7 @@ class TrainCounter(object):
         roi_hist = cv2.calcHist([hsv_roi],[0],mask,[180],[0,180])
         cv2.normalize(roi_hist,roi_hist,0,255,cv2.NORM_MINMAX)
         term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1 )
-<<<<<<< HEAD
         rect.lu_x += 75
-=======
-        rect.lu_x += 100
->>>>>>> add shift in mean
         while capture.isOpened():
             ret, frame = capture.read()
             if not ret:
