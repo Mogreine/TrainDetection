@@ -32,7 +32,7 @@ class Augmentator(object):
     ], random_order=True)
 
     brightness_change = iaa.Sequential([
-        iaa.Multiply(0.2)
+        iaa.Multiply([0.2, 1, 1.5])
     ])
 
     def __init__(self):
@@ -80,11 +80,15 @@ class Augmentator(object):
                 pol = Polygon(points)
                 pols.append(pol)
         psoi = ia.PolygonsOnImage(pols, shape=image.shape)
-        image_aug, psoi_aug = self.brightness_change(image=image, polygons=psoi)
-        # imageio.save(save_path_name)
-        # return psoi_aug
-        images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
-        ia.imshow(np.hstack(images))
+        for i in range(1, 16, 2):
+            aug_func = iaa.Sequential([
+                iaa.Multiply(i / 10)
+            ])
+            image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+            # imageio.save(save_path_name)
+            # return psoi_aug
+            images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+            ia.imshow(np.hstack(images))
         return 0
 
     def test_proc(self, path_to_pic):
@@ -98,5 +102,5 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.proc_all('../../data/images/val', '../../data/via/new/test_plates_rect.json', '../../data/images/test', 1)
+    aug.proc_all('../../data/images/train', '../../data/via/new/train_plates_rect.json', '../../data/images/test', 1)
     # aug.test_proc('test.jpg')
