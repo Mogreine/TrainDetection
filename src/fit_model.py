@@ -94,10 +94,10 @@ def train(model, path_to_dataset):
     dataset_val.prepare()
 
     print("Training network heads")
-    logs = model.train(dataset_train, dataset_val,
-                       learning_rate=config.LEARNING_RATE,
-                       epochs=5,
-                       layers='heads')
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=20,
+                layers='heads')
 
 
 def test_on_pics(model, path_to_pics, pics):
@@ -111,7 +111,7 @@ def test_on_pics(model, path_to_pics, pics):
 
 if __name__ == "__main__":
 
-    MODE = "eval"  # eval or train
+    MODE = "train"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = PlateConfig()
@@ -133,4 +133,5 @@ if __name__ == "__main__":
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
         weights_path = "../logs/with_aug.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, "../data/images/all_pics", ["52026226.jpg"])
+        test_on_pics(model, "../data/images/all_pics",
+                     ["diff.jpg", "55602619_bot.jpg", "51817740_bot.jpg", "52026226_bot.jpg"])

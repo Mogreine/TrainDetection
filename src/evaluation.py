@@ -8,6 +8,7 @@ from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import visualize
 import src.fit_model as fit_model
+import matplotlib.pyplot as plt
 
 ROOT_DIR = "../"
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs/")
@@ -21,7 +22,7 @@ class Evaluator(object):
         self.dataset_val.load_plates(path_to_dataset, "all_pics", path_to_ann)
         self.dataset_val.prepare()
 
-    def eval(self, config):
+    def eval(self, config, threshold=0.5):
         image_ids = self.dataset_val.image_ids
         APs = []
         for image_id in image_ids:
@@ -33,9 +34,10 @@ class Evaluator(object):
             r = results[0]
             AP, precisions, recalls, overlaps = \
                 utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                                 r["rois"], r["class_ids"], r["scores"], r['masks'])
+                                 r["rois"], r["class_ids"], r["scores"], r['masks'], iou_threshold=threshold)
             APs.append(AP)
-        print("mAP: ", np.mean(APs))
+        # print("mAP: ", np.mean(APs))
+        return np.mean(APs)
 
 
 if __name__ == "__main__":
@@ -49,4 +51,16 @@ if __name__ == "__main__":
     model.load_weights(WEIGHTS_PATH, by_name=True)
 
     eval = Evaluator(model, '../data/images/', '../data/via/via_export_json.json')
-    eval.eval(config)
+    aps = []
+    x = []
+    for i in range(50, 100, 5):
+        ap = eval.eval(config, i / 100)
+        aps.append(ap)
+        x.append(i / 100)
+    print("mAP with 1: ", np.mean(aps))
+    plt.plot(x, aps)
+    plt.ylabel('mAP')
+    plt.xlabel('Threshold')
+    plt.suptitle('mAP over threshold')
+    plt.show()
+
