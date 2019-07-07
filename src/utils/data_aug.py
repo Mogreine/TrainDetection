@@ -46,7 +46,6 @@ class Augmentator(object):
                 file_name = f"{file_seg[0]}_{i}.{file_seg[1]}"
                 json_cur['filename'] = file_name
                 json_cur['size'] = a['size']
-                print(psoi)
                 json_cur['regions'] = self.get_regions(psoi, reg_attr)
                 json_cur['file_attributes'] = {}
                 json_all[f'{file_name}{i}'] = json_cur
@@ -54,8 +53,8 @@ class Augmentator(object):
                 self.save_picture(img, saved_path)
                 print('Saved in ', saved_path)
                 i += 2
-        with open(json_save, 'w') as f:
-            json.dump(json_all, f)
+        with open(json_save, 'w', encoding='utf-8') as f:
+            json.dump(json_all, f, ensure_ascii=False, indent=1)
 
     def get_regions(self, psoi_aug, reg_attr):
         regions = []
@@ -63,7 +62,6 @@ class Augmentator(object):
             region = {}
             x_all = p.xx_int.tolist()
             y_all = p.yy_int.tolist()
-            print(type(x_all[0]), type(y_all))
             region['shape_attributes'] = {'name': 'polygon', 'all_points_x': x_all, 'all_points_y': y_all}
             region['region_attributes'] = reg_attr[i]
             regions.append(region)
