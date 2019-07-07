@@ -103,8 +103,8 @@ class Augmentator(object):
             image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
             aug_images.append(image_aug)
             psoi_augs.append(psoi_aug)
-            #images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
-            #ia.imshow(np.hstack(images))
+            # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+            # ia.imshow(np.hstack(images))
         return aug_images, psoi_augs
 
     def save_picture(self, img, file_name):
@@ -114,6 +114,6 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate('data/images/val', 'data/via/new/test_plates_polygon.json', 'data/images/test')
-    #aug.generate('../../data/images/train', '../../data/via/new/train_plates_rect.json', '../../data/images/aug_train')
+    # aug.generate('data/images/val', 'data/via/new/test_plates_polygon.json', 'data/images/test')
+    aug.generate('../../data/images/all_pics', '../../data/via/via_export_json.json', '../../data/images/aug_all')
     # aug.test_proc('test.jpg')
