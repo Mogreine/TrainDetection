@@ -83,7 +83,7 @@ class TrainCounter(object):
         roi_hist = cv2.calcHist([hsv_roi],[0],mask,[180],[0,180])
         cv2.normalize(roi_hist,roi_hist,0,255,cv2.NORM_MINMAX)
         term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1 )
-        rect.lu_x += 100
+        rect.lu_x += 75
         while capture.isOpened():
             ret, frame = capture.read()
             if not ret:
@@ -110,36 +110,6 @@ class TrainCounter(object):
         cv2.destroyAllWindows()
 
 
-def foo2(x):
-    print(x)
-
-
-def foo(path):
-    capture = cv2.VideoCapture(path)
-    cv2.namedWindow("FRAME")
-    cv2.createTrackbar("track", "FRAME", 0, int(capture.get(cv2.CAP_PROP_FRAME_COUNT)), foo2)
-    is_pause = False
-    while capture.isOpened():
-        if not is_pause:
-            res, frame = capture.read()
-        if not res:
-            break
-        # frame = cv2.Canny(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 60, 120)
-        cv2.imshow("FRAME", frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('p'):
-            if is_pause:
-                is_pause = False
-            else:
-                is_pause = True
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    capture.release()
-    cv2.destroyAllWindows()
-
-
 if __name__ == "__main__":
-    tc = TrainCounter('../data/videos/v1.mp4')
-    tc.meanshift(Rectangle(600, 400, width=100, height=100))
-    # foo('data/videos/test_video.mp4')
+    tc = TrainCounter('data/videos/test_video.mp4') # path to video
+    tc.meanshift(Rectangle(600, 400, width=100, height=100)) # set rectangle
