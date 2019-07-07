@@ -1,1 +1,104 @@
-{"51817740.jpg23271":{"filename":"51817740.jpg","size":23271,"regions":[{"shape_attributes":{"name":"rect","x":47,"y":160,"width":160,"height":41},"region_attributes":{"description":"51817740"}}],"file_attributes":{}},"52026226.jpg68177":{"filename":"52026226.jpg","size":68177,"regions":[{"shape_attributes":{"name":"rect","x":72,"y":175,"width":228,"height":60},"region_attributes":{"description":"52026226"}}],"file_attributes":{}},"52026226_bot.jpg84318":{"filename":"52026226_bot.jpg","size":84318,"regions":[{"shape_attributes":{"name":"rect","x":231,"y":173,"width":267,"height":57},"region_attributes":{"description":"52026226"}}],"file_attributes":{}},"54096987.jpg76647":{"filename":"54096987.jpg","size":76647,"regions":[{"shape_attributes":{"name":"rect","x":226,"y":178,"width":310,"height":66},"region_attributes":{"description":"54096987"}}],"file_attributes":{}},"55602619.jpg30459":{"filename":"55602619.jpg","size":30459,"regions":[{"shape_attributes":{"name":"rect","x":88,"y":162,"width":165,"height":36},"region_attributes":{"description":"55602619"}}],"file_attributes":{}},"57059636.jpg74448":{"filename":"57059636.jpg","size":74448,"regions":[{"shape_attributes":{"name":"rect","x":263,"y":182,"width":289,"height":68},"region_attributes":{"description":"57059636"}}],"file_attributes":{}}}
+{
+  "51817740.jpg23271": {
+    "filename": "51817740.jpg",
+    "size": 23271,
+    "regions": [
+      {
+        "shape_attributes": {
+          "name": "rect",
+          "x": 47,
+          "y": 160,
+          "width": 160,
+          "height": 41
+        },
+        "region_attributes": { "description": "51817740" }
+      }
+    ],
+    "file_attributes": {}
+  },
+  "52026226.jpg68177": {
+    "filename": "52026226.jpg",
+    "size": 68177,
+    "regions": [
+      {
+        "shape_attributes": {
+          "name": "rect",
+          "x": 72,
+          "y": 175,
+          "width": 228,
+          "height": 60
+        },
+        "region_attributes": { "description": "52026226" }
+      }
+    ],
+    "file_attributes": {}
+  },
+  "52026226_bot.jpg84318": {
+    "filename": "52026226_bot.jpg",
+    "size": 84318,
+    "regions": [
+      {
+        "shape_attributes": {
+          "name": "rect",
+          "x": 231,
+          "y": 173,
+          "width": 267,
+          "height": 57
+        },
+        "region_attributes": { "description": "52026226" }
+      }
+    ],
+    "file_attributes": {}
+  },
+  "54096987.jpg76647": {
+    "filename": "54096987.jpg",
+    "size": 76647,
+    "regions": [
+      {
+        "shape_attributes": {
+          "name": "rect",
+          "x": 226,
+          "y": 178,
+          "width": 310,
+          "height": 66
+        },
+        "region_attributes": { "description": "54096987" }
+      }
+    ],
+    "file_attributes": {}
+  },
+  "55602619.jpg30459": {
+    "filename": "55602619.jpg",
+    "size": 30459,
+    "regions": [
+      {
+        "shape_attributes": {
+          "name": "rect",
+          "x": 88,
+          "y": 162,
+          "width": 165,
+          "height": 36
+        },
+        "region_attributes": { "description": "55602619" }
+      }
+    ],
+    "file_attributes": {}
+  },
+  "57059636.jpg74448": {
+    "filename": "57059636.jpg",
+    "size": 74448,
+    "regions": [
+      {
+        "shape_attributes": {
+          "name": "rect",
+          "x": 263,
+          "y": 182,
+          "width": 289,
+          "height": 68
+        },
+        "region_attributes": { "description": "57059636" }
+      }
+    ],
+    "file_attributes": {}
+  }
+}
