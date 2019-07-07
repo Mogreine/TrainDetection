@@ -38,18 +38,45 @@ class Augmentator(object):
         annotations = json.load(open(path_to_ann))
         annotations = list(annotations.values())
         annotations = [a for a in annotations if a['regions']]
+        json_save = os.path.join(path_to_save, 'ann.json')
+        json_all = {}
         for a in annotations:
             image_path = os.path.join(path_to_pics, a['filename'])
             if type(a['regions']) is dict:
                 polygons = [r['shape_attributes'] for r in a['regions'].values()]
+                reg_attr = [r['region_attributes'] for r in a['regions'].values()]
             else:
                 polygons = [r['shape_attributes'] for r in a['regions']]
+                reg_attr = [r['region_attributes'] for r in a['regions']]
+            print(reg_attr)
             file_seg = a['filename'].split('.')
             for i in range(count_from_pic):
-                saved_path = os.path.join(path_to_save, f"{file_seg[0]}_{i}.{file_seg[1]}")
+                json_cur = {}
+                file_name = f"{file_seg[0]}_{i}.{file_seg[1]}"
+                json_cur['filename'] = file_name
+                json_cur['size'] = a['size']
+                saved_path = os.path.join(path_to_save, file_name)
                 psoi_aug = self.proc(image_path, polygons, saved_path)
+                json_cur['regions'] = self.get_regions(json_cur, psoi_aug, reg_attr)
+                json_cur['file_attributes'] = {}
                 print('Saved in ', saved_path)
+                json_all[f'{file_name}{i}'] = json_cur
                 #print(polygons)
+        with open(json_save, 'w') as f:
+            json.dump(json_all, f)
+
+    def get_regions(self, json_cur, psoi_aug, reg_attr):
+        regions = []
+        for i, p in enumerate(psoi_aug.polygons):
+            region = {}
+            x_all = p.xx_int.tolist()
+            y_all = p.yy_int.tolist()
+            print(type(x_all[0]), type(y_all))
+            region['shape_attributes'] = {'name': 'polygon', 'all_points_x': x_all, 'all_points_y': y_all}
+            region['region_attributes'] = reg_attr[i]
+            regions.append(region)
+        print(regions)
+        return regions
 
     def proc(self, path_to_pic, shapes, save_path_name):
         image = imageio.imread(path_to_pic)
@@ -77,11 +104,11 @@ class Augmentator(object):
                 pols.append(pol)
         psoi = ia.PolygonsOnImage(pols, shape=image.shape)
         image_aug, psoi_aug = self.seq2(image=image, polygons=psoi)
-        # imageio.save(save_path_name)
+        imageio.save(save_path_name)
         # return psoi_aug
-        images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
-        ia.imshow(np.hstack(images))
-        return 0
+        # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+        # ia.imshow(np.hstack(images))
+        return psoi_aug
 
     def test_proc(self, path_to_pic):
         image = imageio.imread(path_to_pic)
