@@ -117,7 +117,7 @@ if __name__ == "__main__":
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
         # model.load_weights(weights_path, by_name=True)
-        train(model, "../data/images")
+        train(model, paths.IMAGES_PATH)
     else:
         class EvalConfig(PlateConfig):
             # Batch size = GPU_COUNT * IMAGES_PER_GPU
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = "../logs/with_aug.h5"
+        weights_path = paths.WEIGHTS_PATH + "our/with_aug.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, "../data/images/all_pics",
+        test_on_pics(model, paths.IMAGES_PATH + "all_pics",
                      ["diff.jpg", "55602619_bot.jpg", "51817740_bot.jpg", "52026226_bot.jpg"])
