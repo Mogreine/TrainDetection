@@ -115,4 +115,4 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'all_pics', paths.ANNOTATIONS_PATH + 'via_export_json.json', paths.IMAGES_PATH + 'aug_all')
+    aug.generate(paths.IMAGES_PATH + 'side_pics/init/train/', paths.ANNOTATIONS_PATH + 'via_export_json.json', paths.IMAGES_PATH + 'aug_all')
