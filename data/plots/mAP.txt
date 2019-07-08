@@ -1,4 +1,8 @@
 mAP with 1:  0.70
 mAP without 1:  0.84
 
-mAP(0.5): 0.795
+
+mAP(0.05) 5 epochs: 0.795
+mAP(0.05) 20 epochs: 0.845
+
+mAP(0.05) 22 epochs no aug: 0.795

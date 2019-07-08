@@ -9,10 +9,9 @@ from mrcnn import model as modellib, utils
 from mrcnn import visualize
 import src.fit_model as fit_model
 import matplotlib.pyplot as plt
+from src.all_paths import Paths
 
-ROOT_DIR = "../"
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs/")
-WEIGHTS_PATH = "../logs/weights/val_22.h5"
+paths = Paths()
 
 
 class Evaluator(object):
@@ -47,10 +46,10 @@ if __name__ == "__main__":
 
 
     config = EvalConfig()
-    model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
-    model.load_weights(WEIGHTS_PATH, by_name=True)
+    model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
+    model.load_weights(paths.WEIGHTS_PATH, by_name=True)
 
-    eval = Evaluator(model, '../data/images/', '../data/via/via_export_json.json')
+    eval = Evaluator(model, paths.IMAGES_PATH, paths.ANNOTATIONS_PATH + 'via_export_json.json')
     aps = []
     x = []
     for i in range(50, 100, 5):

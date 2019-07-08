@@ -4,17 +4,13 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage.draw
-
-ROOT_DIR = '../'
-
-sys.path.append(ROOT_DIR)
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import visualize
 
-COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "logs/mask_rcnn_coco.h5")
-NOMEROFF_NET_WEIGHTS_PATH = os.path.join(ROOT_DIR, "logs/nomeroff_net.h5")
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs/")
+from src.all_paths import Paths
+
+paths = Paths()
 
 
 class PlateConfig(Config):
@@ -82,15 +78,15 @@ class PlateDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train(model, path_to_dataset):
+def train(model, path_to_dataset=paths.IMAGES_PATH):
     # Training dataset
     dataset_train = PlateDataset()
-    dataset_train.load_plates(path_to_dataset, "aug_all", '../data/via/ann.json')
+    dataset_train.load_plates(path_to_dataset, "aug_all", paths.ANNOTATIONS_PATH + 'ann.json')
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = PlateDataset()
-    dataset_val.load_plates(path_to_dataset, "all_pics", '../data/via/via_export_json.json')
+    dataset_val.load_plates(path_to_dataset, "all_pics", paths.ANNOTATIONS_PATH + 'via_export_json.json')
     dataset_val.prepare()
 
     print("Training network heads")
@@ -115,8 +111,8 @@ if __name__ == "__main__":
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = PlateConfig()
-        model = modellib.MaskRCNN(mode="training", config=config, model_dir=DEFAULT_LOGS_DIR)
-        weights_path = NOMEROFF_NET_WEIGHTS_PATH
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
+        weights_path = paths.NOMEROFF_NET_WEIGHTS_PATH
         model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
@@ -130,7 +126,7 @@ if __name__ == "__main__":
 
 
         config = EvalConfig()
-        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=DEFAULT_LOGS_DIR)
+        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
         weights_path = "../logs/with_aug.h5"
         model.load_weights(weights_path, by_name=True)
         test_on_pics(model, "../data/images/all_pics",

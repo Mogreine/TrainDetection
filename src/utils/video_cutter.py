@@ -2,7 +2,9 @@ import os
 import time
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
+from src.all_paths import Paths
+
+paths = Paths('../../')
 
 
 class Frame(object):
@@ -55,5 +57,5 @@ if __name__ == "__main__":
     # 710x81
     # frames = [Frame(710, 81, 1132 - 710, 562 - 81)] # vid3
     frames = [Frame(135, 51, 594, 532)]  # test_vidio
-    cutter = Cutter('data/videos/test_video.mp4', 'data/images/tmp', 'pic', frames)
+    cutter = Cutter(paths.VIDEOS_PATH + 'test_video.mp4', paths.IMAGES_PATH + 'tmp', 'pic', frames)
     cutter.run()

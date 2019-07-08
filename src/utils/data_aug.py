@@ -6,6 +6,9 @@ import imgaug as ia
 import numpy as np
 from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
+from src.all_paths import Paths
+
+paths = Paths('../../')
 
 
 class Augmentator(object):
@@ -112,6 +115,4 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    # aug.generate('data/images/val', 'data/via/new/test_plates_polygon.json', 'data/images/test')
-    aug.generate('../../data/images/all_pics', '../../data/via/via_export_json.json', '../../data/images/aug_all')
-    # aug.test_proc('test.jpg')
+    aug.generate(paths.IMAGES_PATH + 'all_pics', paths.ANNOTATIONS_PATH + 'via_export_json.json', paths.IMAGES_PATH + 'aug_all')
