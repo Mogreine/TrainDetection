@@ -106,7 +106,7 @@ def test_on_pics(model, path_to_pics, pics):
 
 
 if __name__ == "__main__":
-    MODE = "train"  # eval or train
+    MODE = "eval"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = PlateConfig()
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = paths.WEIGHTS_PATH + "our/with_aug.h5"
+        weights_path = paths.WEIGHTS_PATH + "our/side_20.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, paths.IMAGES_PATH + "all_pics",
-                     ["diff.jpg", "55602619_bot.jpg", "51817740_bot.jpg", "52026226_bot.jpg"])
+        test_on_pics(model, paths.IMAGES_PATH + "side_pics/init/val/",
+                     ["61322186.jpg", "73372633.jpg", '52026226.jpg', '54096987.jpg'])

@@ -1,10 +1,10 @@
 .idea/*
 .vscode/*
-logs/*
+weights/*
 */__pycache__/*
 *.jpg
 *.png
 *.mp4
 *.h5
 *.avi
-data/plots/mAP.txt
+data/plots/*
