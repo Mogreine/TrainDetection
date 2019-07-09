@@ -109,7 +109,7 @@ class TrainCounter(object):
         capture.release()
         cv2.destroyAllWindows()
 
-        
+
 if __name__ == "__main__":
     tc = TrainCounter('data/videos/test_video.mp4') # path to video
     tc.meanshift(Rectangle(600, 400, width=100, height=100)) # set rectangle
