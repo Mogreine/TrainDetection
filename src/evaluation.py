@@ -18,7 +18,7 @@ class Evaluator(object):
     def __init__(self, model, path_to_dataset, path_to_ann):
         self.model = model
         self.dataset_val = fit_model.PlateDataset()
-        self.dataset_val.load_plates(path_to_dataset, "side_pics/init/val/", path_to_ann)
+        self.dataset_val.load_plates(path_to_dataset, "all_pics_aug/", path_to_ann)
         self.dataset_val.prepare()
 
     def eval(self, config, threshold=0.5):
@@ -47,9 +47,9 @@ if __name__ == "__main__":
 
     config = EvalConfig()
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-    model.load_weights(paths.WEIGHTS_PATH + 'our/side_20.h5', by_name=True)
+    model.load_weights(paths.WEIGHTS_PATH + 'our/ruin_all.h5', by_name=True)
 
-    eval = Evaluator(model, paths.IMAGES_PATH, paths.ANNOTATIONS_PATH + 'new/test_plates_polygon.json')
+    eval = Evaluator(model, paths.IMAGES_PATH, paths.IMAGES_PATH + 'all_pics_aug/ann_val.json')
     aps = []
     x = []
     for i in range(50, 100, 5):

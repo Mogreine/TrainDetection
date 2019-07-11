@@ -9,17 +9,17 @@ from mrcnn import model as modellib, utils
 from mrcnn import visualize
 from src.utils.all_paths import Paths
 
-paths = Paths()
+paths = Paths('../')
 
 
 class PlateConfig(Config):
     NAME = "train_number_plates"
     IMAGES_PER_GPU = 1
     NUM_CLASSES = 1 + 1
-    STEPS_PER_EPOCH = 80
+    STEPS_PER_EPOCH = 100
     IMAGE_MIN_DIM = 128
     IMAGE_MAX_DIM = 1024
-    DETECTION_MIN_CONFIDENCE = 0.85
+    DETECTION_MIN_CONFIDENCE = 0.9
 
 
 class PlateDataset(utils.Dataset):
@@ -80,18 +80,18 @@ class PlateDataset(utils.Dataset):
 def train(model, path_to_dataset=paths.IMAGES_PATH):
     # Training dataset
     dataset_train = PlateDataset()
-    dataset_train.load_plates(path_to_dataset, "side_pics/init/train/", paths.ANNOTATIONS_PATH + 'new/train_plates_polygon.json')
+    dataset_train.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/ann_train.json")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = PlateDataset()
-    dataset_val.load_plates(path_to_dataset, "side_pics/init/val/", paths.ANNOTATIONS_PATH + 'new/test_plates_polygon.json')
+    dataset_val.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/ann_val.json")
     dataset_val.prepare()
 
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=20,
+                epochs=30,
                 layers='heads')
 
 
@@ -105,7 +105,7 @@ def test_on_pics(model, path_to_pics, pics):
 
 
 if __name__ == "__main__":
-    MODE = "eval"  # eval or train
+    MODE = "train"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = PlateConfig()

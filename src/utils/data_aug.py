@@ -8,7 +8,7 @@ from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
 from src.utils.all_paths import Paths
 
-paths = Paths('')
+paths = Paths('../../')
 
 
 class Augmentator(object):
@@ -47,25 +47,27 @@ class Augmentator(object):
                 self.save_picture(img, saved_path)
                 print('Saved in ', saved_path)
                 i += 2
-        json_train, json_val = self.div_arr(json_all_arr)
+        json_train, json_val = self.split_arr(json_all_arr)
         with open(os.path.join(path_to_save, 'ann_train.json'), 'w', encoding='utf-8') as f:
             json.dump(json_train, f, ensure_ascii=False, indent=1)
+
         with open(os.path.join(path_to_save, 'ann_val.json'), 'w', encoding='utf-8') as f:
             json.dump(json_val, f, ensure_ascii=False, indent=1)
+
         with open(json_save, 'w', encoding='utf-8') as f:
             json.dump(json_all, f, ensure_ascii=False, indent=1)
 
-    def div_arr(self, arr):
-        np.random.permutation(arr)
-        part = 0.7 * len(arr)
-        json_1 = {}
-        json_2 = {}
+    def split_arr(self, arr, train_part=0.7):
+        arr = np.random.permutation(arr)
+        train_size = train_part * len(arr)
+        train_json = {}
+        val_json = {}
         for i, node in enumerate(arr):
-            if i < part:
-                json_1[node[0]] = node[1]
+            if i <= train_size:
+                train_json[node[0]] = node[1]
             else:
-                json_2[node[0]] = node[1]
-        return json_1, json_2
+                val_json[node[0]] = node[1]
+        return train_json, val_json
 
     def get_regions(self, psoi_aug, reg_attr):
         regions = []
