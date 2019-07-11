@@ -6,7 +6,7 @@ import imgaug as ia
 import numpy as np
 from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths('../../')
 

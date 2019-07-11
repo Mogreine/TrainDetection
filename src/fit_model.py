@@ -7,8 +7,7 @@ import skimage.draw
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import visualize
-
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths()
 

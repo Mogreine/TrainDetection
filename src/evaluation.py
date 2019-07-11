@@ -9,7 +9,7 @@ from mrcnn import model as modellib, utils
 from mrcnn import visualize
 import src.fit_model as fit_model
 import matplotlib.pyplot as plt
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths()
 
