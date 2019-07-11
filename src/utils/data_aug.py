@@ -6,9 +6,9 @@ import imgaug as ia
 import numpy as np
 from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
-from src.all_paths import Paths
+from all_paths import Paths
 
-paths = Paths('../../')
+paths = Paths('')
 
 
 class Augmentator(object):
@@ -21,6 +21,7 @@ class Augmentator(object):
         annotations = [a for a in annotations if a['regions']]
         json_save = os.path.join(path_to_save, 'ann.json')
         json_all = {}
+        json_all_arr = []
         for a in annotations:
             image_path = os.path.join(path_to_pics, a['filename'])
             if type(a['regions']) is dict:
@@ -41,12 +42,30 @@ class Augmentator(object):
                 json_cur['regions'] = self.get_regions(psoi, reg_attr)
                 json_cur['file_attributes'] = {}
                 json_all[f'{file_name}{i}'] = json_cur
+                json_all_arr.append((f'{file_name}{i}', json_cur))
                 saved_path = os.path.join(path_to_save, file_name)
                 self.save_picture(img, saved_path)
                 print('Saved in ', saved_path)
                 i += 2
+        json_train, json_val = self.div_arr(json_all_arr)
+        with open(os.path.join(path_to_save, 'ann_train.json'), 'w', encoding='utf-8') as f:
+            json.dump(json_train, f, ensure_ascii=False, indent=1)
+        with open(os.path.join(path_to_save, 'ann_val.json'), 'w', encoding='utf-8') as f:
+            json.dump(json_val, f, ensure_ascii=False, indent=1)
         with open(json_save, 'w', encoding='utf-8') as f:
             json.dump(json_all, f, ensure_ascii=False, indent=1)
+
+    def div_arr(self, arr):
+        np.random.permutation(arr)
+        part = 0.7 * len(arr)
+        json_1 = {}
+        json_2 = {}
+        for i, node in enumerate(arr):
+            if i < part:
+                json_1[node[0]] = node[1]
+            else:
+                json_2[node[0]] = node[1]
+        return json_1, json_2
 
     def get_regions(self, psoi_aug, reg_attr):
         regions = []
