@@ -8,7 +8,7 @@ from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
 from src.utils.all_paths import Paths
 
-paths = Paths('')
+paths = Paths('../../')
 
 
 class Augmentator(object):
@@ -41,10 +41,10 @@ class Augmentator(object):
                 json_cur['size'] = a['size']
                 json_cur['regions'] = self.get_regions(psoi, reg_attr)
                 json_cur['file_attributes'] = {}
-                json_all[f'{file_name}{i}'] = json_cur
-                json_all_arr.append((f'{file_name}{i}', json_cur))
                 saved_path = os.path.join(path_to_save, file_name)
-                self.save_picture(img, saved_path)
+                pic_size = self.save_picture(img, saved_path)
+                json_all[f'{file_name}{pic_size}'] = json_cur
+                json_all_arr.append((f'{file_name}{pic_size}', json_cur))
                 print('Saved in ', saved_path)
                 i += 2
         json_train, json_val = self.div_arr(json_all_arr)
@@ -69,10 +69,21 @@ class Augmentator(object):
 
     def get_regions(self, psoi_aug, reg_attr):
         regions = []
+        height, width, _ = psoi_aug.shape
         for i, p in enumerate(psoi_aug.polygons):
             region = {}
             x_all = p.xx_int.tolist()
             y_all = p.yy_int.tolist()
+            for z in range(len(x_all)):
+                if x_all[z] < 0:
+                    x_all[z] = 0
+                elif x_all[z] >= width:
+                    x_all[z] = width - 1
+            for z in range(len(y_all)):
+                if y_all[z] < 0:
+                    y_all[z] = 0
+                elif y_all[z] >= height:
+                    y_all[z] = height - 1
             region['shape_attributes'] = {'name': 'polygon', 'all_points_x': x_all, 'all_points_y': y_all}
             region['region_attributes'] = reg_attr[i]
             regions.append(region)
@@ -137,7 +148,7 @@ class Augmentator(object):
 
     def save_picture(self, img, file_name):
         cv2.imwrite(file_name, img)
-
+        return os.path.getsize(file_name)
 
 if __name__ == "__main__":
     ia.seed(4)
