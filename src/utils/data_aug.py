@@ -12,17 +12,6 @@ paths = Paths('../../')
 
 
 class Augmentator(object):
-    seq2 = iaa.Sequential([
-        iaa.CropAndPad(percent=(-0.2, 0.2), pad_mode="edge"),
-        iaa.AddToHueAndSaturation((-60, 60)),
-        iaa.ElasticTransformation(alpha=90, sigma=9),
-        iaa.CoarseDropout((0.01, 0.1), size_percent=0.01)
-    ], random_order=True)
-
-    brightness_change = iaa.Sequential([
-        iaa.Multiply([0.2, 1, 1.5])
-    ])
-
     def __init__(self):
         pass
 
@@ -106,6 +95,25 @@ class Augmentator(object):
             psoi_augs.append(psoi_aug)
             # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
             # ia.imshow(np.hstack(images))
+
+        for i in range(-30, 30, 10):
+            aug_func = iaa.Sequential([
+                iaa.Affine(rotate=i)
+            ])
+            image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+            aug_images.append(image_aug)
+            psoi_augs.append(psoi_aug)
+            # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+            # ia.imshow(np.hstack(images))
+
+        aug_func = iaa.Sequential([
+            iaa.Fliplr(1)
+        ])
+        image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+        aug_images.append(image_aug)
+        psoi_augs.append(psoi_aug)
+        # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+        # ia.imshow(np.hstack(images))
         return aug_images, psoi_augs
 
     def save_picture(self, img, file_name):
@@ -115,4 +123,4 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'side_pics/init/train/', paths.ANNOTATIONS_PATH + 'via_export_json.json', paths.IMAGES_PATH + 'aug_all')
+    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/all_pics.json', paths.IMAGES_PATH + 'tmp/')
