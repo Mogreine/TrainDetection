@@ -6,3 +6,5 @@ mAP(0.05) 5 epochs: 0.795
 mAP(0.05) 20 epochs: 0.845
 
 mAP(0.05) 22 epochs no aug: 0.795
+
+mAP(0.05) 20 epochs aug 100 test: 0.826

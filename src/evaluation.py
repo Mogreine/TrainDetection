@@ -47,19 +47,19 @@ if __name__ == "__main__":
 
     config = EvalConfig()
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-    model.load_weights(paths.WEIGHTS_PATH + 'our/ruin_all.h5', by_name=True)
+    model.load_weights(paths.WEIGHTS_PATH + 'our/final_12.h5', by_name=True)
 
-    eval = Evaluator(model, paths.IMAGES_PATH, paths.IMAGES_PATH + 'all_pics_aug/ann_val.json')
+    eval = Evaluator(model, paths.IMAGES_PATH, paths.IMAGES_PATH + 'all_pics_aug/hundred.json')
     aps = []
     x = []
     for i in range(50, 100, 5):
         ap = eval.eval(config, i / 100)
         aps.append(ap)
         x.append(i / 100)
-    print("mAP: {:.3f}", np.mean(aps))
+    print("mAP: {:.3f}".format(np.mean(aps)))
     plt.plot(x, aps)
     plt.ylabel('AP')
     plt.xlabel('Recall threshold')
-    plt.suptitle('mAP over threshold')
+    plt.suptitle('AP over threshold')
     plt.show()
 

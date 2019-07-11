@@ -118,7 +118,7 @@ class Augmentator(object):
         psoi = ia.PolygonsOnImage(pols, shape=image.shape)
         aug_images = []
         psoi_augs = []
-        for i in range(1, 16, 2):
+        for i in range(7, 16, 6):
             aug_func = iaa.Sequential([
                 iaa.Multiply(i / 10)
             ])
@@ -128,7 +128,7 @@ class Augmentator(object):
             # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
             # ia.imshow(np.hstack(images))
 
-        for i in range(-30, 30, 10):
+        for i in range(-10, 21, 20):
             aug_func = iaa.Sequential([
                 iaa.Affine(rotate=i)
             ])
@@ -138,12 +138,12 @@ class Augmentator(object):
             # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
             # ia.imshow(np.hstack(images))
 
-        aug_func = iaa.Sequential([
-            iaa.Fliplr(1)
-        ])
-        image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
-        aug_images.append(image_aug)
-        psoi_augs.append(psoi_aug)
+        # aug_func = iaa.Sequential([
+        #     iaa.Fliplr(1)
+        # ])
+        # image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+        # aug_images.append(image_aug)
+        # psoi_augs.append(psoi_aug)
         # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
         # ia.imshow(np.hstack(images))
         return aug_images, psoi_augs
@@ -152,7 +152,8 @@ class Augmentator(object):
         cv2.imwrite(file_name, img)
         return os.path.getsize(file_name)
 
+
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/all_pics.json', paths.IMAGES_PATH + 'tmp/')
+    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/hundred.json', paths.IMAGES_PATH + 'tmp/')

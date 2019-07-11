@@ -8,3 +8,4 @@ weights/*
 *.h5
 *.avi
 data/plots/*
+*.json
