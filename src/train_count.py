@@ -9,7 +9,17 @@ paths = Paths('../')
 
 
 class Rectangle(object):
+    """ Represents a rectangle
+    """
+
     def __init__(self, x, y, width=None, height=None, x2=None, y2=None):
+        """
+        Inputs:
+            x, y - coordinates of left upper corner
+            width, height - width and height of rectangle
+            or
+            x2, y2 - coordinates of right bottom corner
+        """
         assert width is not None and height is not None or x2 is not None and y2 is not None
         self.lu_x = x
         self.lu_y = y
@@ -25,13 +35,27 @@ class Rectangle(object):
             self.rd_y = y + height
 
     def get_points(self):
+        """
+        Return:
+            x1, y1, x2, y2 - coordinates of left upper and right bottom corners of rectangle
+        """
         return self.lu_x, self.lu_y, self.rd_x, self.rd_y
 
     def get_with_params(self):
+        """
+        Return:
+            x, y - coordinates of left upper of rectangle
+            width, height - width and height of rectangle
+        """
         return self.lu_x, self.lu_y, self.width, self.height
 
 
 class TrainCounter(object):
+    """ Train counting
+    Params:
+        train_count - number of trains already passed
+        threshold - distance between tracking window and video screen border to increment train_count and shift window
+    """
     train_count = 0
     threshold = 20
 
@@ -43,7 +67,7 @@ class TrainCounter(object):
         ret, frame = capture.read()
         track_window = rect.get_with_params()
         roi = frame[rect.lu_y:rect.lu_y + rect.height,
-              rect.lu_x:rect.lu_x + rect.width]
+                    rect.lu_x:rect.lu_x + rect.width]
         hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
                            np.array((180., 255., 255.)))
@@ -66,7 +90,7 @@ class TrainCounter(object):
                 print(self.train_count)
                 track_window = rect.get_with_params()
                 roi = frame[rect.lu_y:rect.lu_y + rect.height,
-                      rect.lu_x:rect.lu_x + rect.width]
+                            rect.lu_x:rect.lu_x + rect.width]
                 hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(hsv_roi, np.array(
                     (0., 60., 32.)), np.array((180., 255., 255.)))
@@ -91,7 +115,7 @@ class TrainCounter(object):
         ret, frame = capture.read()
         track_window = rect.get_with_params()
         roi = frame[rect.lu_y:rect.lu_y + rect.height,
-              rect.lu_x:rect.lu_x + rect.width]
+                    rect.lu_x:rect.lu_x + rect.width]
         hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)  # COLOR_BGR2HSV
         mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
                            np.array((180., 255., 255.)))
@@ -115,7 +139,7 @@ class TrainCounter(object):
                 print(self.train_count)
                 track_window = rect.get_with_params()
                 roi = frame[rect.lu_y:rect.lu_y + rect.height,
-                      rect.lu_x:rect.lu_x + rect.width]
+                            rect.lu_x:rect.lu_x + rect.width]
                 hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(hsv_roi, np.array(
                     (0., 60., 32.)), np.array((180., 255., 255.)))
