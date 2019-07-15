@@ -1,31 +1,31 @@
 import numpy as np
 from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+from mrcnn.model import MaskRCNN, utils
 from mrcnn import visualize
 import src.fit_model as fit_model
 import cv2
 from src.utils.all_paths import Paths
 from src.fit_model import PlateConfig, PlateDataset
+from typing import List, Tuple
 
 paths = Paths('../')
 
 
-def add_mask(img, masks, color):
+def add_mask(img: np.ndarray, masks: np.ndarray, color: Tuple[int, int, int]) -> np.ndarray:
     for mask in masks:
         img = visualize.apply_mask(img, mask, color)
-    # if mask.shape[-1] > 0:
-    #     mask = (np.sum(mask, -1, keepdims=True) >= 1)
-    #     img = np.where(mask, img).astype(np.uint8)
     return img
 
-def add_boxes(img, rois):
+
+def add_boxes(img: np.ndarray, rois) -> np.ndarray:
     for roi in rois:
         y1, x1, y2, x2 = roi
         cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2, 4)
     return img
 
 
-def add_instances(image, boxes, masks, class_ids, class_names, scores = None):
+def add_instances(image: np.ndarray, boxes: np.ndarray, masks: np.ndarray,
+                  class_ids: np.ndarray, class_names: List[str], scores: np.ndarray = None) -> np.ndarray:
     N = boxes.shape[0]
     if not N:
         return image
@@ -40,7 +40,8 @@ def add_instances(image, boxes, masks, class_ids, class_names, scores = None):
 
     return image
 
-def video_detect(path_to_video, path_to_save, model):
+
+def video_detect(path_to_video: str, path_to_save: str, model: MaskRCNN) -> None:
     capture = cv2.VideoCapture(path_to_video)
     width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -71,7 +72,7 @@ if __name__ == "__main__":
         IMAGES_PER_GPU = 1
 
     config = EvalConfig()
-    model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
+    model = MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
     weights_path = paths.WEIGHTS_PATH + "our/final_20.h5"
     model.load_weights(weights_path, by_name=True)
-    video_detect(paths.VIDEOS_PATH + 'test.mp4', paths.VIDEOS_PATH + 'predict.mp4', model)
+    video_detect(paths.VIDEOS_PATH + 'angle.mp4', paths.VIDEOS_PATH + 'predict.mp4', model)
