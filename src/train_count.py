@@ -3,9 +3,9 @@ import time
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from utils.all_paths import Paths
+from src.utils.all_paths import Paths
 
-paths = Paths('')
+paths = Paths('../')
 
 
 class Rectangle(object):
@@ -14,11 +14,11 @@ class Rectangle(object):
 
     def __init__(self, x, y, width=None, height=None, x2=None, y2=None):
         """
-        Params:
-            x, y - coordinates of left upper corner
-            width, height - width and height of rectangle
+        Input:
+            x, y - coordinates of the left upper corner
+            width, height - width and height of the rectangle
             or
-            x2, y2 - coordinates of right bottom corner
+            x2, y2 - coordinates of the right bottom corner
         """
         assert width is not None and height is not None or x2 is not None and y2 is not None
         self.lu_x = x
@@ -37,15 +37,15 @@ class Rectangle(object):
     def get_points(self):
         """
         Return:
-            x1, y1, x2, y2 - coordinates of left upper and right bottom corners of rectangle
+            x1, y1, x2, y2 - coordinates of left upper and right bottom corners of the rectangle
         """
         return self.lu_x, self.lu_y, self.rd_x, self.rd_y
 
     def get_with_params(self):
         """
         Return:
-            x, y - coordinates of left upper of rectangle
-            width, height - width and height of rectangle
+            x, y - coordinates of left upper of the rectangle
+            width, height - width and height of the rectangle
         """
         return self.lu_x, self.lu_y, self.width, self.height
 
@@ -54,7 +54,7 @@ class TrainCounter(object):
     """ Train counting
     Params:
         train_count - number of trains already passed
-        threshold - distance between tracking window and video screen border to increment train_count and shift window
+        threshold - distance between tracking the window and a video's screen border
     """
     train_count = 0
     threshold = 20
@@ -215,5 +215,6 @@ class TrainCounter(object):
 
 
 if __name__ == "__main__":
-    tc = TrainCounter(paths.VIDEOS_PATH + 'test_video.mp4')
+    tc = TrainCounter(paths.VIDEOS_PATH + 'angle_video.mp4')
+    # set rectangle
     tc.meanshift(Rectangle(600, 400, width=100, height=100))
