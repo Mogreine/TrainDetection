@@ -3,6 +3,9 @@ import time
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from src.utils.all_paths import Paths
+
+paths = Paths('../')
 
 
 class Rectangle(object):
@@ -32,7 +35,7 @@ class TrainCounter(object):
     train_count = 0
     threshold = 20
 
-    def __init__(self, path_to_video):
+    def __init__(self, path_to_video: str):
         self.path_to_video = path_to_video
 
     def camshift(self, rect: Rectangle):
@@ -40,7 +43,7 @@ class TrainCounter(object):
         ret, frame = capture.read()
         track_window = rect.get_with_params()
         roi = frame[rect.lu_y:rect.lu_y + rect.height,
-                    rect.lu_x:rect.lu_x + rect.width]
+              rect.lu_x:rect.lu_x + rect.width]
         hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
                            np.array((180., 255., 255.)))
@@ -63,7 +66,7 @@ class TrainCounter(object):
                 print(self.train_count)
                 track_window = rect.get_with_params()
                 roi = frame[rect.lu_y:rect.lu_y + rect.height,
-                            rect.lu_x:rect.lu_x + rect.width]
+                      rect.lu_x:rect.lu_x + rect.width]
                 hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(hsv_roi, np.array(
                     (0., 60., 32.)), np.array((180., 255., 255.)))
@@ -76,7 +79,7 @@ class TrainCounter(object):
         capture.release()
         cv2.destroyAllWindows()
 
-    def meanshift(self, rect: Rectangle, path_to_save=None):
+    def meanshift(self, rect: Rectangle, path_to_save: str = None):
         capture = cv2.VideoCapture(self.path_to_video)
         if path_to_save is not None:
             width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -88,7 +91,7 @@ class TrainCounter(object):
         ret, frame = capture.read()
         track_window = rect.get_with_params()
         roi = frame[rect.lu_y:rect.lu_y + rect.height,
-                    rect.lu_x:rect.lu_x + rect.width]
+              rect.lu_x:rect.lu_x + rect.width]
         hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)  # COLOR_BGR2HSV
         mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
                            np.array((180., 255., 255.)))
@@ -112,7 +115,7 @@ class TrainCounter(object):
                 print(self.train_count)
                 track_window = rect.get_with_params()
                 roi = frame[rect.lu_y:rect.lu_y + rect.height,
-                            rect.lu_x:rect.lu_x + rect.width]
+                      rect.lu_x:rect.lu_x + rect.width]
                 hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(hsv_roi, np.array(
                     (0., 60., 32.)), np.array((180., 255., 255.)))
@@ -133,5 +136,5 @@ class TrainCounter(object):
 
 
 if __name__ == "__main__":
-    tc = TrainCounter('data/videos/test_video.mp4')  # path to video
+    tc = TrainCounter(paths.VIDEOS_PATH + 'angle_video.mp4')  # path to video
     tc.meanshift(Rectangle(600, 400, width=100, height=100))  # set rectangle
