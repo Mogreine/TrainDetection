@@ -12,7 +12,7 @@ class Rectangle(object):
     """ Represents a rectangle
     """
 
-    def __init__(self, x, y, width=None, height=None, x2=None, y2=None):
+    def __init__(self, x: int, y: int, width: int = None, height: int = None, x2: int = None, y2: int = None):
         """
         Input:
             x, y - coordinates of the left upper corner
@@ -34,14 +34,14 @@ class Rectangle(object):
             self.rd_x = x + width
             self.rd_y = y + height
 
-    def get_points(self):
+    def get_points(self) -> (int, int, int, int):
         """
         Return:
             x1, y1, x2, y2 - coordinates of left upper and right bottom corners of the rectangle
         """
         return self.lu_x, self.lu_y, self.rd_x, self.rd_y
 
-    def get_with_params(self):
+    def get_with_params(self) -> (int, int, int, int):
         """
         Return:
             x, y - coordinates of left upper of the rectangle
@@ -68,7 +68,7 @@ class TrainCounter(object):
         self.path_to_video = path_to_video
         self.path_to_save = path_to_save
 
-    def camshift(self, rect: Rectangle):
+    def camshift(self, rect: Rectangle) -> None:
         """ Implements camshift algorithm from OpenCV lib
         """
 
@@ -131,7 +131,7 @@ class TrainCounter(object):
         capture.release()
         cv2.destroyAllWindows()
 
-    def meanshift(self, rect: Rectangle):
+    def meanshift(self, rect: Rectangle) -> None:
         """ Implements meanshift algorithm from OpenCV lib
         """
         capture = cv2.VideoCapture(self.path_to_video)

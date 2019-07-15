@@ -7,6 +7,7 @@ import numpy as np
 from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
 from src.utils.all_paths import Paths
+from typing import List, Tuple, Dict
 
 paths = Paths('../../')
 
@@ -15,7 +16,7 @@ class Augmentator(object):
     def __init__(self):
         pass
 
-    def generate(self, path_to_pics: str, path_to_ann: str, path_to_save: str):
+    def generate(self, path_to_pics: str, path_to_ann: str, path_to_save: str) -> None:
         annotations = json.load(open(path_to_ann))
         annotations = list(annotations.values())
         annotations = [a for a in annotations if a['regions']]
@@ -57,7 +58,7 @@ class Augmentator(object):
         with open(json_save, 'w', encoding='utf-8') as f:
             json.dump(json_all, f, ensure_ascii=False, indent=1)
 
-    def split_arr(self, arr, train_part: float = 0.7):
+    def split_arr(self, arr: List, train_part: float = 0.7) -> (Dict, Dict):
         arr = np.random.permutation(arr)
         train_size = train_part * len(arr)
         train_json = {}
@@ -69,7 +70,7 @@ class Augmentator(object):
                 val_json[node[0]] = node[1]
         return train_json, val_json
 
-    def get_regions(self, psoi_aug, reg_attr):
+    def get_regions(self, psoi_aug, reg_attr) -> List[Dict]:
         regions = []
         height, width, _ = psoi_aug.shape
         for i, p in enumerate(psoi_aug.polygons):
@@ -91,7 +92,7 @@ class Augmentator(object):
             regions.append(region)
         return regions
 
-    def generate_images(self, path_to_pic: str, shapes):
+    def generate_images(self, path_to_pic: str, shapes: List[Dict]) -> (List, List):
         image = imageio.imread(path_to_pic)
         pols = []
         for p in shapes:
@@ -148,7 +149,7 @@ class Augmentator(object):
         # ia.imshow(np.hstack(images))
         return aug_images, psoi_augs
 
-    def save_picture(self, img, file_name):
+    def save_picture(self, img: np.ndarray, file_name: str) -> int:
         cv2.imwrite(file_name, img)
         return os.path.getsize(file_name)
 
@@ -156,4 +157,5 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/hundred.json', paths.IMAGES_PATH + 'tmp/')
+    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/hundred.json',
+                 paths.IMAGES_PATH + 'tmp/')
