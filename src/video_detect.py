@@ -1,6 +1,6 @@
 import numpy as np
 from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+from mrcnn.model import MaskRCNN
 from mrcnn import visualize
 import src.fit_model as fit_model
 import cv2
@@ -18,6 +18,7 @@ def add_mask(img, masks, color):
     #     img = np.where(mask, img).astype(np.uint8)
     return img
 
+
 def add_boxes(img, rois):
     for roi in rois:
         y1, x1, y2, x2 = roi
@@ -25,7 +26,7 @@ def add_boxes(img, rois):
     return img
 
 
-def add_instances(image, boxes, masks, class_ids, class_names, scores = None):
+def add_instances(image: np.ndarray, boxes, masks, class_ids, class_names, scores=None):
     N = boxes.shape[0]
     if not N:
         return image
@@ -40,21 +41,26 @@ def add_instances(image, boxes, masks, class_ids, class_names, scores = None):
 
     return image
 
-def video_detect(path_to_video, path_to_save, model):
+
+# start time and duration in seconds
+def video_detect(path_to_video: str, path_to_save: str, model, start_time: int = 0, duration: int = 10000000) -> None:
     capture = cv2.VideoCapture(path_to_video)
     width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(capture.get(cv2.CAP_PROP_FPS))
 
     vwriter = cv2.VideoWriter(path_to_save,
-                            cv2.VideoWriter_fourcc(*'MJPG'),
-                            fps, (width, height))
+                              cv2.VideoWriter_fourcc(*'MJPG'),
+                              fps, (width, height))
     count = 0
-    while capture.isOpened():
+    while capture.isOpened() and count < fps * duration:
         success, frame = capture.read()
         print(f"frame: {count}")
         if not success:
             break
+        if count < start_time * fps:
+            count += 1
+            continue
         # frame = frame[..., ::-1]
         r = model.detect([frame], verbose=0)[0]
         frame = add_instances(frame, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'], r['scores'])
@@ -70,8 +76,9 @@ if __name__ == "__main__":
         GPU_COUNT = 1
         IMAGES_PER_GPU = 1
 
+
     config = EvalConfig()
-    model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
+    model = MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
     weights_path = paths.WEIGHTS_PATH + "our/final_20.h5"
     model.load_weights(weights_path, by_name=True)
-    video_detect(paths.VIDEOS_PATH + 'test.mp4', paths.VIDEOS_PATH + 'predict.mp4', model)
+    video_detect(paths.VIDEOS_PATH + 'v1.mp4', paths.VIDEOS_PATH + 'v1_predict.mp4', model)
