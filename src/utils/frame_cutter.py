@@ -1,6 +1,6 @@
 import cv2
 import os
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths('../../')
 

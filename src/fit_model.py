@@ -7,20 +7,21 @@ import skimage.draw
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import visualize
+from src.utils.all_paths import Paths
 
-from src.all_paths import Paths
+paths = Paths('../')
 
-paths = Paths()
+EPOCHS_NUMBER = 20
 
 
 class PlateConfig(Config):
     NAME = "train_number_plates"
     IMAGES_PER_GPU = 1
     NUM_CLASSES = 1 + 1
-    STEPS_PER_EPOCH = 80
+    STEPS_PER_EPOCH = 398
     IMAGE_MIN_DIM = 128
     IMAGE_MAX_DIM = 1024
-    DETECTION_MIN_CONFIDENCE = 0.85
+    DETECTION_MIN_CONFIDENCE = 0.9
 
 
 class PlateDataset(utils.Dataset):
@@ -81,18 +82,18 @@ class PlateDataset(utils.Dataset):
 def train(model, path_to_dataset=paths.IMAGES_PATH):
     # Training dataset
     dataset_train = PlateDataset()
-    dataset_train.load_plates(path_to_dataset, "side_pics/init/train/", paths.ANNOTATIONS_PATH + 'new/train_plates_polygon.json')
+    dataset_train.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/ann.json")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = PlateDataset()
-    dataset_val.load_plates(path_to_dataset, "side_pics/init/val/", paths.ANNOTATIONS_PATH + 'new/test_plates_polygon.json')
+    dataset_val.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/hundred.json")
     dataset_val.prepare()
 
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=20,
+                epochs=EPOCHS_NUMBER,
                 layers='heads')
 
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
 
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = paths.WEIGHTS_PATH + "our/side_20.h5"
+        weights_path = paths.WEIGHTS_PATH + "our/final_20.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, paths.IMAGES_PATH + "side_pics/init/val/",
+        test_on_pics(model, paths.IMAGES_PATH + "all_pics/",
                      ["61322186.jpg", "73372633.jpg", '52026226.jpg', '54096987.jpg'])

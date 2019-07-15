@@ -9,7 +9,7 @@ from mrcnn import model as modellib, utils
 from mrcnn import visualize
 import src.fit_model as fit_model
 import matplotlib.pyplot as plt
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths()
 
@@ -18,7 +18,7 @@ class Evaluator(object):
     def __init__(self, model, path_to_dataset, path_to_ann):
         self.model = model
         self.dataset_val = fit_model.PlateDataset()
-        self.dataset_val.load_plates(path_to_dataset, "side_pics/init/val/", path_to_ann)
+        self.dataset_val.load_plates(path_to_dataset, "all_pics_aug/", path_to_ann)
         self.dataset_val.prepare()
 
     def eval(self, config, threshold=0.5):
@@ -47,19 +47,19 @@ if __name__ == "__main__":
 
     config = EvalConfig()
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-    model.load_weights(paths.WEIGHTS_PATH + 'our/side_20.h5', by_name=True)
+    model.load_weights(paths.WEIGHTS_PATH + 'our/final_12.h5', by_name=True)
 
-    eval = Evaluator(model, paths.IMAGES_PATH, paths.ANNOTATIONS_PATH + 'new/test_plates_polygon.json')
+    eval = Evaluator(model, paths.IMAGES_PATH, paths.IMAGES_PATH + 'all_pics_aug/hundred.json')
     aps = []
     x = []
     for i in range(50, 100, 5):
         ap = eval.eval(config, i / 100)
         aps.append(ap)
         x.append(i / 100)
-    print("mAP: {:.3f}", np.mean(aps))
+    print("mAP: {:.3f}".format(np.mean(aps)))
     plt.plot(x, aps)
     plt.ylabel('AP')
     plt.xlabel('Recall threshold')
-    plt.suptitle('mAP over threshold')
+    plt.suptitle('AP over threshold')
     plt.show()
 

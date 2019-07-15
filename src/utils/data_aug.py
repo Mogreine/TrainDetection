@@ -6,23 +6,12 @@ import imgaug as ia
 import numpy as np
 from imgaug import augmenters as iaa
 from imgaug.augmentables.polys import Polygon, PolygonsOnImage
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths('../../')
 
 
 class Augmentator(object):
-    seq2 = iaa.Sequential([
-        iaa.CropAndPad(percent=(-0.2, 0.2), pad_mode="edge"),
-        iaa.AddToHueAndSaturation((-60, 60)),
-        iaa.ElasticTransformation(alpha=90, sigma=9),
-        iaa.CoarseDropout((0.01, 0.1), size_percent=0.01)
-    ], random_order=True)
-
-    brightness_change = iaa.Sequential([
-        iaa.Multiply([0.2, 1, 1.5])
-    ])
-
     def __init__(self):
         pass
 
@@ -32,6 +21,7 @@ class Augmentator(object):
         annotations = [a for a in annotations if a['regions']]
         json_save = os.path.join(path_to_save, 'ann.json')
         json_all = {}
+        json_all_arr = []
         for a in annotations:
             image_path = os.path.join(path_to_pics, a['filename'])
             if type(a['regions']) is dict:
@@ -51,20 +41,51 @@ class Augmentator(object):
                 json_cur['size'] = a['size']
                 json_cur['regions'] = self.get_regions(psoi, reg_attr)
                 json_cur['file_attributes'] = {}
-                json_all[f'{file_name}{i}'] = json_cur
                 saved_path = os.path.join(path_to_save, file_name)
-                self.save_picture(img, saved_path)
+                pic_size = self.save_picture(img, saved_path)
+                json_all[f'{file_name}{pic_size}'] = json_cur
+                json_all_arr.append((f'{file_name}{pic_size}', json_cur))
                 print('Saved in ', saved_path)
                 i += 2
+        json_train, json_val = self.split_arr(json_all_arr)
+        with open(os.path.join(path_to_save, 'ann_train.json'), 'w', encoding='utf-8') as f:
+            json.dump(json_train, f, ensure_ascii=False, indent=1)
+
+        with open(os.path.join(path_to_save, 'ann_val.json'), 'w', encoding='utf-8') as f:
+            json.dump(json_val, f, ensure_ascii=False, indent=1)
+
         with open(json_save, 'w', encoding='utf-8') as f:
             json.dump(json_all, f, ensure_ascii=False, indent=1)
 
+    def split_arr(self, arr, train_part=0.7):
+        arr = np.random.permutation(arr)
+        train_size = train_part * len(arr)
+        train_json = {}
+        val_json = {}
+        for i, node in enumerate(arr):
+            if i <= train_size:
+                train_json[node[0]] = node[1]
+            else:
+                val_json[node[0]] = node[1]
+        return train_json, val_json
+
     def get_regions(self, psoi_aug, reg_attr):
         regions = []
+        height, width, _ = psoi_aug.shape
         for i, p in enumerate(psoi_aug.polygons):
             region = {}
             x_all = p.xx_int.tolist()
             y_all = p.yy_int.tolist()
+            for z in range(len(x_all)):
+                if x_all[z] < 0:
+                    x_all[z] = 0
+                elif x_all[z] >= width:
+                    x_all[z] = width - 1
+            for z in range(len(y_all)):
+                if y_all[z] < 0:
+                    y_all[z] = 0
+                elif y_all[z] >= height:
+                    y_all[z] = height - 1
             region['shape_attributes'] = {'name': 'polygon', 'all_points_x': x_all, 'all_points_y': y_all}
             region['region_attributes'] = reg_attr[i]
             regions.append(region)
@@ -97,7 +118,7 @@ class Augmentator(object):
         psoi = ia.PolygonsOnImage(pols, shape=image.shape)
         aug_images = []
         psoi_augs = []
-        for i in range(1, 16, 2):
+        for i in range(7, 16, 6):
             aug_func = iaa.Sequential([
                 iaa.Multiply(i / 10)
             ])
@@ -106,13 +127,33 @@ class Augmentator(object):
             psoi_augs.append(psoi_aug)
             # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
             # ia.imshow(np.hstack(images))
+
+        for i in range(-10, 21, 20):
+            aug_func = iaa.Sequential([
+                iaa.Affine(rotate=i)
+            ])
+            image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+            aug_images.append(image_aug)
+            psoi_augs.append(psoi_aug)
+            # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+            # ia.imshow(np.hstack(images))
+
+        # aug_func = iaa.Sequential([
+        #     iaa.Fliplr(1)
+        # ])
+        # image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+        # aug_images.append(image_aug)
+        # psoi_augs.append(psoi_aug)
+        # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
+        # ia.imshow(np.hstack(images))
         return aug_images, psoi_augs
 
     def save_picture(self, img, file_name):
         cv2.imwrite(file_name, img)
+        return os.path.getsize(file_name)
 
 
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'side_pics/init/train/', paths.ANNOTATIONS_PATH + 'via_export_json.json', paths.IMAGES_PATH + 'aug_all')
+    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/hundred.json', paths.IMAGES_PATH + 'tmp/')

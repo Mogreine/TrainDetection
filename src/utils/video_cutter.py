@@ -2,7 +2,7 @@ import os
 import time
 import cv2
 import numpy as np
-from src.all_paths import Paths
+from src.utils.all_paths import Paths
 
 paths = Paths('../../')
 
