@@ -5,7 +5,9 @@ import datetime
 import numpy as np
 import skimage.draw
 from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+from mrcnn.model import MaskRCNN
+from mrcnn import model as modellib
+from mrcnn import utils
 from mrcnn import visualize
 import src.fit_model as fit_model
 import matplotlib.pyplot as plt
@@ -15,13 +17,13 @@ paths = Paths()
 
 
 class Evaluator(object):
-    def __init__(self, model, path_to_dataset, path_to_ann):
+    def __init__(self, model: MaskRCNN, path_to_dataset: str, path_to_ann: str):
         self.model = model
         self.dataset_val = fit_model.PlateDataset()
         self.dataset_val.load_plates(path_to_dataset, "all_pics_aug/", path_to_ann)
         self.dataset_val.prepare()
 
-    def eval(self, config, threshold=0.5):
+    def eval(self, config: 'model configuration', threshold: float = 0.5):
         image_ids = self.dataset_val.image_ids
         APs = []
         for image_id in image_ids:
@@ -47,7 +49,7 @@ if __name__ == "__main__":
 
     config = EvalConfig()
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-    model.load_weights(paths.WEIGHTS_PATH + 'our/final_12.h5', by_name=True)
+    model.load_weights(paths.WEIGHTS_PATH + 'our/final_20.h5', by_name=True)
 
     eval = Evaluator(model, paths.IMAGES_PATH, paths.IMAGES_PATH + 'all_pics_aug/hundred.json')
     aps = []
@@ -62,4 +64,3 @@ if __name__ == "__main__":
     plt.xlabel('Recall threshold')
     plt.suptitle('AP over threshold')
     plt.show()
-

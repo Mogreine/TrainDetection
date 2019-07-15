@@ -6,8 +6,10 @@ import numpy as np
 import skimage.draw
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
+from mrcnn.model import MaskRCNN
 from mrcnn import visualize
 from src.utils.all_paths import Paths
+from typing import List
 
 paths = Paths('../')
 
@@ -25,8 +27,7 @@ class PlateConfig(Config):
 
 
 class PlateDataset(utils.Dataset):
-
-    def load_plates(self, dataset_dir, subset, annotations_path):
+    def load_plates(self, dataset_dir: str, subset: str, annotations_path: str):
         self.add_class("train_number_plates", 1, "train_number_plates")
         # assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
@@ -50,7 +51,7 @@ class PlateDataset(utils.Dataset):
                 width=width, height=height,
                 polygons=polygons)
 
-    def load_mask(self, image_id):
+    def load_mask(self, image_id: int) -> (np.ndarray, np.ndarray):
         image_info = self.image_info[image_id]
         if image_info["source"] != "train_number_plates":
             return super(self.__class__, self).load_mask(image_id)
@@ -71,7 +72,7 @@ class PlateDataset(utils.Dataset):
             # print(mask[rr, cc, i])
         return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
 
-    def image_reference(self, image_id):
+    def image_reference(self, image_id: int):
         info = self.image_info[image_id]
         if info["source"] == "train_number_plates":
             return info["path"]
@@ -79,7 +80,7 @@ class PlateDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train(model, path_to_dataset=paths.IMAGES_PATH):
+def train(model: MaskRCNN, path_to_dataset: str = paths.IMAGES_PATH) -> None:
     # Training dataset
     dataset_train = PlateDataset()
     dataset_train.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/ann.json")
@@ -97,7 +98,7 @@ def train(model, path_to_dataset=paths.IMAGES_PATH):
                 layers='heads')
 
 
-def test_on_pics(model, path_to_pics, pics):
+def test_on_pics(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
     for pic in pics:
         image = skimage.io.imread(os.path.join(path_to_pics, pic))
         results = model.detect([image], verbose=1)
@@ -123,7 +124,6 @@ if __name__ == "__main__":
             # Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
-
 
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)

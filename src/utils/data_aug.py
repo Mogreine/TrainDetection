@@ -15,7 +15,7 @@ class Augmentator(object):
     def __init__(self):
         pass
 
-    def generate(self, path_to_pics, path_to_ann, path_to_save):
+    def generate(self, path_to_pics: str, path_to_ann: str, path_to_save: str):
         annotations = json.load(open(path_to_ann))
         annotations = list(annotations.values())
         annotations = [a for a in annotations if a['regions']]
@@ -57,7 +57,7 @@ class Augmentator(object):
         with open(json_save, 'w', encoding='utf-8') as f:
             json.dump(json_all, f, ensure_ascii=False, indent=1)
 
-    def split_arr(self, arr, train_part=0.7):
+    def split_arr(self, arr, train_part: float = 0.7):
         arr = np.random.permutation(arr)
         train_size = train_part * len(arr)
         train_json = {}
@@ -91,7 +91,7 @@ class Augmentator(object):
             regions.append(region)
         return regions
 
-    def generate_images(self, path_to_pic, shapes):
+    def generate_images(self, path_to_pic: str, shapes):
         image = imageio.imread(path_to_pic)
         pols = []
         for p in shapes:
