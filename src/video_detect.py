@@ -11,7 +11,7 @@ from typing import List, Tuple
 paths = Paths('../')
 
 
-def add_mask(img: np.ndarray, masks: np.ndarray, color: Tuple[int, int, int]) -> np.ndarray:
+def add_mask(img: np.ndarray, masks: List, color: Tuple[int, int, int]) -> np.ndarray:
     for mask in masks:
         img = visualize.apply_mask(img, mask, color)
     return img
@@ -24,7 +24,7 @@ def add_boxes(img: np.ndarray, rois) -> np.ndarray:
     return img
 
 
-def add_instances(image: np.ndarray, boxes: np.ndarray, masks: np.ndarray,
+def add_instances(image: np.ndarray, boxes: np.array, masks: List,
                   class_ids: np.ndarray, class_names: List[str], scores: np.ndarray = None) -> np.ndarray:
     N = boxes.shape[0]
     if not N:
@@ -42,7 +42,8 @@ def add_instances(image: np.ndarray, boxes: np.ndarray, masks: np.ndarray,
 
 
 # start time and duration in seconds
-def video_detect(path_to_video: str, path_to_save: str, model, start_time: int = 0, duration: int = 10000000) -> None:
+def video_detect(path_to_video: str, path_to_save: str, model: MaskRCNN,
+                 start_time: int = 0, duration: int = 10000000) -> None:
     capture = cv2.VideoCapture(path_to_video)
     width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -52,7 +53,7 @@ def video_detect(path_to_video: str, path_to_save: str, model, start_time: int =
                               cv2.VideoWriter_fourcc(*'MJPG'),
                               fps, (width, height))
     count = 0
-    while capture.isOpened() and count < fps * duration:
+    while capture.isOpened() and count < fps * (start_time + duration):
         success, frame = capture.read()
         print(f"frame: {count}")
         if not success:
