@@ -20,14 +20,14 @@ class OCRConfig(Config):
     NAME = "OCR"
     IMAGES_PER_GPU = 1
     NUM_CLASSES = 1 + 9
-    STEPS_PER_EPOCH = 398
+    STEPS_PER_EPOCH = 20
     IMAGE_MIN_DIM = 128
     IMAGE_MAX_DIM = 1024
     DETECTION_MIN_CONFIDENCE = 0.9
 
 
 class DigitsDataset(utils.Dataset):
-    def load_plates(self, dataset_dir: str, subset: str, annotations_path: str):
+    def load_digits(self, dataset_dir: str, subset: str, annotations_path: str):
         self.add_class("digits", 1, "1")
         self.add_class("digits", 2, "2")
         self.add_class("digits", 3, "3")
@@ -48,8 +48,11 @@ class DigitsDataset(utils.Dataset):
             if type(a['regions']) is dict:
                 polygons = [r['shape_attributes']
                             for r in a['regions'].values()]
+                descriptions = [r['region_attributes']
+                                for r in a['regions'].values()]
             else:
                 polygons = [r['shape_attributes'] for r in a['regions']]
+                descriptions = [r['region_attributes'] for r in a['regions']]
             image_path = os.path.join(dataset_dir, a['filename'])
             image = skimage.io.imread(image_path)
             height, width = image.shape[:2]
@@ -59,7 +62,7 @@ class DigitsDataset(utils.Dataset):
                 image_id=a['filename'],
                 path=image_path,
                 width=width, height=height,
-                polygons=polygons)
+                polygons=polygons, descriptions=descriptions)
 
     def load_mask(self, image_id: int) -> (np.ndarray, np.ndarray):
         image_info = self.image_info[image_id]
@@ -69,6 +72,7 @@ class DigitsDataset(utils.Dataset):
         info = self.image_info[image_id]
         mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
                         dtype=np.uint8)
+        class_id = {}
         for i, p in enumerate(info["polygons"]):
             if p['name'] == 'polygon':
                 rr, cc = skimage.draw.polygon(
@@ -77,7 +81,11 @@ class DigitsDataset(utils.Dataset):
                 rr, cc = skimage.draw.rectangle(
                     (p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
             mask[rr, cc, i] = 1
-        return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
+            class_id[i] = int(info['descriptions'][i]['description'])
+            if class_id[i] == 0:
+                class_id[i] = 10
+        class_ids = np.array([v for _, v in class_id.items()])
+        return mask.astype(np.bool), class_ids.astype(np.int32)
 
     def image_reference(self, image_id: int):
         info = self.image_info[image_id]
@@ -90,14 +98,14 @@ class DigitsDataset(utils.Dataset):
 def train(model: MaskRCNN, path_to_dataset: str = paths.IMAGES_PATH) -> None:
     # Training dataset
     dataset_train = DigitsDataset()
-    dataset_train.load_plates(
-        path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/ann.json")
+    dataset_train.load_digits(
+        path_to_dataset, "numbers/", path_to_dataset + "numbers/ann.json")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = DigitsDataset()
-    dataset_val.load_plates(path_to_dataset, "all_pics_aug/",
-                            path_to_dataset + "all_pics_aug/hundred.json")
+    dataset_train.load_digits(
+        path_to_dataset, "numbers/", path_to_dataset + "numbers/ann.json")
     dataset_val.prepare()
 
     print("Training network heads")
@@ -117,13 +125,13 @@ def test_on_pics(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
 
 
 if __name__ == "__main__":
-    MODE = "eval"  # eval or train
+    MODE = "train"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = OCRConfig()
         model = modellib.MaskRCNN(
             mode="training", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = paths.NOMEROFF_NET_WEIGHTS_PATH
+        weights_path = 'mask_rcnn_coco.h5'
         model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
