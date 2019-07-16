@@ -45,6 +45,7 @@ class Augmentator(object):
                 saved_path = os.path.join(path_to_save, file_name)
                 pic_size = self.save_picture(img, saved_path)
                 json_all[f'{file_name}{pic_size}'] = json_cur
+                json_cur['size'] = pic_size
                 json_all_arr.append((f'{file_name}{pic_size}', json_cur))
                 print('Saved in ', saved_path)
                 i += 1
