@@ -121,12 +121,9 @@ class Augmentator(object):
         aug_images = []
         psoi_augs = []
         transforms = [iaa.Fliplr(1),
-                      iaa.GaussianBlur(2),
+                      iaa.GaussianBlur(5),
                       iaa.SaltAndPepper(0.2),
-                      iaa.Affine(rotate=-10),
-                      iaa.Affine(rotate=10),
                       iaa.Multiply(0.6),
-                      iaa.Multiply(0.8),
                       iaa.Multiply(1.2),
                       iaa.ElasticTransformation(sigma=0.2, alpha=3)]
         for trans in transforms:
