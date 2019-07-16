@@ -11,18 +11,19 @@ from mrcnn import visualize
 from utils.all_paths import Paths
 from typing import List
 
-paths = Paths('')
+paths = Paths('../')
 
 EPOCHS_NUMBER = 20
+STEPS = 160
 
 
 class OCRConfig(Config):
     NAME = "OCR"
     IMAGES_PER_GPU = 1
-    NUM_CLASSES = 1 + 9
-    STEPS_PER_EPOCH = 20
-    IMAGE_MIN_DIM = 128
-    IMAGE_MAX_DIM = 1024
+    NUM_CLASSES = 1 + 10
+    STEPS_PER_EPOCH = STEPS
+    IMAGE_MIN_DIM = 32
+    IMAGE_MAX_DIM = 512
     DETECTION_MIN_CONFIDENCE = 0.9
 
 
@@ -98,14 +99,12 @@ class DigitsDataset(utils.Dataset):
 def train(model: MaskRCNN, path_to_dataset: str = paths.IMAGES_PATH) -> None:
     # Training dataset
     dataset_train = DigitsDataset()
-    dataset_train.load_digits(
-        path_to_dataset, "numbers/", path_to_dataset + "numbers/ann.json")
+    dataset_train.load_digits(path_to_dataset, "numbers_aug/", path_to_dataset + "numbers_aug/all.json")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = DigitsDataset()
-    dataset_train.load_digits(
-        path_to_dataset, "numbers/", path_to_dataset + "numbers/ann.json")
+    dataset_val.load_digits(path_to_dataset, "numbers/", path_to_dataset + "numbers/numbers_annotation.json")
     dataset_val.prepare()
 
     print("Training network heads")
@@ -115,23 +114,23 @@ def train(model: MaskRCNN, path_to_dataset: str = paths.IMAGES_PATH) -> None:
                 layers='heads')
 
 
-def test_on_pics(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
+def detect_on_pic(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
     for pic in pics:
         image = skimage.io.imread(os.path.join(path_to_pics, pic))
         results = model.detect([image], verbose=1)
         r = results[0]
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'],
+        ids = ['BG'] + [str(i) for i in range(1, 11)]
+        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ids,
                                     r['scores'])
 
 
 if __name__ == "__main__":
-    MODE = "train"  # eval or train
+    MODE = "eval"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = OCRConfig()
-        model = modellib.MaskRCNN(
-            mode="training", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = 'mask_rcnn_coco.h5'
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
+        weights_path = paths.WEIGHTS_PATH + 'pretrained/mask_rcnn_coco.h5'
         model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
@@ -144,9 +143,9 @@ if __name__ == "__main__":
             IMAGES_PER_GPU = 1
 
         config = EvalConfig()
-        model = modellib.MaskRCNN(
-            mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = paths.WEIGHTS_PATH + "our/final_20.h5"
+        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
+        weights_path = paths.WEIGHTS_PATH + "our/numbers_COCO_aug_20.h5"
         model.load_weights(weights_path, by_name=True)
-        test_on_pics(model, paths.IMAGES_PATH + "all_pics/",
-                     ["61322186.jpg", "73372633.jpg", '52026226.jpg', '54096987.jpg'])
+        pics = list(filter(lambda name: name[len(name) - 3:] == 'jpg', os.listdir(paths.IMAGES_PATH + 'numbers/')))
+        detect_on_pic(model, paths.IMAGES_PATH + "numbers/",
+                      pics)

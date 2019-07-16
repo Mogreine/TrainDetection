@@ -20,7 +20,7 @@ class Augmentator(object):
         annotations = json.load(open(path_to_ann))
         annotations = list(annotations.values())
         annotations = [a for a in annotations if a['regions']]
-        json_save = os.path.join(path_to_save, 'ann.json')
+        json_save = os.path.join(path_to_save, 'all.json')
         json_all = {}
         json_all_arr = []
         for a in annotations:
@@ -139,12 +139,17 @@ class Augmentator(object):
             # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
             # ia.imshow(np.hstack(images))
 
-        # aug_func = iaa.Sequential([
-        #     iaa.Fliplr(1)
-        # ])
-        # image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
-        # aug_images.append(image_aug)
-        # psoi_augs.append(psoi_aug)
+        transforms = [iaa.Fliplr(1),
+                      iaa.GaussianBlur(2),
+                      iaa.SaltAndPepper(0.2),
+                      iaa.ElasticTransformation(sigma=0.2, alpha=3)]
+        for trans in transforms:
+            aug_func = iaa.Sequential([
+                trans
+            ])
+            image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
+            aug_images.append(image_aug)
+            psoi_augs.append(psoi_aug)
         # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
         # ia.imshow(np.hstack(images))
         return aug_images, psoi_augs
@@ -157,5 +162,5 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'all_pics/', paths.IMAGES_PATH + 'all_pics/hundred.json',
+    aug.generate(paths.IMAGES_PATH + 'numbers/', paths.IMAGES_PATH + 'numbers/numbers_annotation.json',
                  paths.IMAGES_PATH + 'tmp/')
