@@ -2,7 +2,7 @@ import numpy as np
 
 
 class RecognizeHelper(object):
-    def get_number(self, rois: np.ndarray, class_ids: np.array) -> str:
+    def get_number(self, rois: np.array, class_ids: np.array) -> str:
         centroids = []
         for i in range(len(rois)):
             y1, x1, y2, x2 = rois[i]

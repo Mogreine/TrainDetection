@@ -8,13 +8,14 @@ from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn.model import MaskRCNN
 from mrcnn import visualize
-from utils.all_paths import Paths
+from src.utils.all_paths import Paths
 from typing import List
+from src.utils.recognizer import RecognizeHelper
 
 paths = Paths('../')
 
 EPOCHS_NUMBER = 20
-STEPS = 160
+STEPS = 120
 
 
 class OCRConfig(Config):
@@ -22,7 +23,7 @@ class OCRConfig(Config):
     IMAGES_PER_GPU = 1
     NUM_CLASSES = 1 + 10
     STEPS_PER_EPOCH = STEPS
-    IMAGE_MIN_DIM = 32
+    IMAGE_MIN_DIM = 16
     IMAGE_MAX_DIM = 512
     DETECTION_MIN_CONFIDENCE = 0.9
 
@@ -115,17 +116,29 @@ def train(model: MaskRCNN, path_to_dataset: str = paths.IMAGES_PATH) -> None:
 
 
 def detect_on_pic(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
+    recognizer = RecognizeHelper()
+    correct_preds = 0
+    all_preds = 0
     for pic in pics:
         image = skimage.io.imread(os.path.join(path_to_pics, pic))
-        results = model.detect([image], verbose=1)
+        results = model.detect([image], verbose=0)
         r = results[0]
         ids = ['BG'] + [str(i) for i in range(1, 11)]
         visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ids,
                                     r['scores'])
 
+        number = recognizer.get_number(r['rois'], r['class_ids'])
+        true_number = ''.join([i for i in pic if 48 <= ord(i) <= 57])
+        true_number = true_number[1:]
+        print(f'True: {true_number}, predicted: {number}')
+        if true_number == number:
+            correct_preds += 1
+        all_preds += 1
+    print(f'Score: {correct_preds}/{all_preds}')
+
 
 if __name__ == "__main__":
-    MODE = "train"  # eval or train
+    MODE = "eval"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = OCRConfig()
@@ -144,7 +157,7 @@ if __name__ == "__main__":
 
         config = EvalConfig()
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=paths.WEIGHT_LOGS_PATH)
-        weights_path = paths.WEIGHTS_PATH + "our/numbers_COCO_aug_20.h5"
+        weights_path = paths.WEIGHTS_PATH + "our/numbers_no_rotate.h5"
         model.load_weights(weights_path, by_name=True)
         pics = list(filter(lambda name: name[len(name) - 3:] == 'jpg', os.listdir(paths.IMAGES_PATH + 'numbers/')))
         detect_on_pic(model, paths.IMAGES_PATH + "numbers/",
