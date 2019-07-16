@@ -47,7 +47,7 @@ class Augmentator(object):
                 json_all[f'{file_name}{pic_size}'] = json_cur
                 json_all_arr.append((f'{file_name}{pic_size}', json_cur))
                 print('Saved in ', saved_path)
-                i += 2
+                i += 1
         json_train, json_val = self.split_arr(json_all_arr)
         with open(os.path.join(path_to_save, 'ann_train.json'), 'w', encoding='utf-8') as f:
             json.dump(json_train, f, ensure_ascii=False, indent=1)
@@ -119,29 +119,14 @@ class Augmentator(object):
         psoi = ia.PolygonsOnImage(pols, shape=image.shape)
         aug_images = []
         psoi_augs = []
-        for i in range(7, 16, 6):
-            aug_func = iaa.Sequential([
-                iaa.Multiply(i / 10)
-            ])
-            image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
-            aug_images.append(image_aug)
-            psoi_augs.append(psoi_aug)
-            # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
-            # ia.imshow(np.hstack(images))
-
-        for i in range(-10, 21, 20):
-            aug_func = iaa.Sequential([
-                iaa.Affine(rotate=i)
-            ])
-            image_aug, psoi_aug = aug_func(image=image, polygons=psoi)
-            aug_images.append(image_aug)
-            psoi_augs.append(psoi_aug)
-            # images = [psoi_aug.draw_on_image(image_aug, alpha_face=0.2, size_points=7), image]
-            # ia.imshow(np.hstack(images))
-
         transforms = [iaa.Fliplr(1),
                       iaa.GaussianBlur(2),
                       iaa.SaltAndPepper(0.2),
+                      iaa.Affine(rotate=-10),
+                      iaa.Affine(rotate=10),
+                      iaa.Multiply(0.6),
+                      iaa.Multiply(0.8),
+                      iaa.Multiply(1.2),
                       iaa.ElasticTransformation(sigma=0.2, alpha=3)]
         for trans in transforms:
             aug_func = iaa.Sequential([
@@ -162,5 +147,5 @@ class Augmentator(object):
 if __name__ == "__main__":
     ia.seed(4)
     aug = Augmentator()
-    aug.generate(paths.IMAGES_PATH + 'numbers/', paths.IMAGES_PATH + 'numbers/numbers_annotation.json',
+    aug.generate(paths.IMAGES_PATH + 'numbers/', paths.IMAGES_PATH + 'numbers/fixed_ones.json',
                  paths.IMAGES_PATH + 'tmp/')
