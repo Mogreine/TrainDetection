@@ -24,7 +24,9 @@ class OCR:
             epochs: int = 20, layers: str = 'heads', logs_path: str = paths.WEIGHT_LOGS_PATH,
             weights_path: str = paths.WEIGHTS_PATH + 'pretrained/mask_rcnn_coco.h5') -> None:
         train_dataset.load()
+        train_dataset.prepare()
         val_dataset.load()
+        val_dataset.prepare()
 
         self.config.EPOCHS = epochs
         self.config.STEPS_PER_EPOCH = train_dataset.set_size

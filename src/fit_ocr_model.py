@@ -20,11 +20,11 @@ STEPS = 120
 
 
 if __name__ == "__main__":
-    MODE = "eval"  # eval or train
+    MODE = "train"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
-        train_ds = DigitDataset(dataset_dir=paths.IMAGES_PATH + 'numbers_aug', annotations_name='all.json')
-        val_ds = DigitDataset(dataset_dir=paths.IMAGES_PATH + 'numbers', annotations_name='fixed_ones.json')
+        train_ds = DigitDataset(dataset_dir=paths.IMAGES_PATH + 'numbers_aug/', annotations_name='all.json')
+        val_ds = DigitDataset(dataset_dir=paths.IMAGES_PATH + 'numbers/', annotations_name='fixed_ones.json')
         ocr = OCR(image_min_dim=16, image_max_dim=512)
         ocr.fit(train_ds, val_ds, epochs=30)
     else:

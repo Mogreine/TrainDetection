@@ -108,7 +108,7 @@ def test_on_pics(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
 
 
 if __name__ == "__main__":
-    MODE = "eval"  # eval or train
+    MODE = "train"  # eval or train
     assert MODE in ["eval", "train"]
     if MODE == "train":
         config = PlateConfig()

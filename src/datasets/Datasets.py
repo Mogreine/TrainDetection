@@ -6,7 +6,7 @@ from mrcnn import utils
 from src.utils.all_paths import Paths
 from typing import List, Dict
 
-paths = Paths('../../')
+paths = Paths('../')
 
 
 class GeneralDataset(utils.Dataset):
