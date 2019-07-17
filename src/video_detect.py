@@ -2,12 +2,12 @@ import numpy as np
 from mrcnn.config import Config
 from mrcnn.model import MaskRCNN, utils
 from mrcnn import visualize
-import src.fit_model as fit_model
-import src.fit_ocr_model as fit_ocr_model
+import fit_model as fit_model
+import fit_ocr_model as fit_ocr_model
 import cv2
 from src.utils.all_paths import Paths
-from fit_model import PlateConfig
-from fit_ocr_model import OCRConfig
+from src.fit_model import PlateConfig
+from src.fit_ocr_model import OCRConfig
 from src.utils.recognizer import RecognizeHelper
 from typing import List, Tuple
 
@@ -87,8 +87,9 @@ def video_detect(path_to_video: str, path_to_save: str, detect_model: MaskRCNN, 
         e2 = cv2.getTickCount()
         time = (e2 - e1) / cv2.getTickFrequency()
         all_time += time
+        eta = (all_frame_count - count) * all_time / count
         print(
-            f'on frame {count} with ETA: {(all_frame_count - count) * all_time / count}')
+            f'on frame {count} with ETA: {eta} sec or {eta // 60} min')
     vwriter.release()
     print("Saved to ", path_to_save)
 
