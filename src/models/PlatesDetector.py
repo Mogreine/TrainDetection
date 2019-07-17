@@ -10,8 +10,6 @@ import os
 
 paths = Paths('../')
 
-class Model:
-
 
 class OCR:
     def __init__(self, name: str = 'OCR', num_classes: int = 10, image_min_dim: int = 16, image_max_dim: int = 512):
@@ -57,7 +55,6 @@ class OCR:
             visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ids,
                                         r['scores'])
 
-            number = self.get_number(r['rois'], r['class_ids'])
             preds.append(number)
         return preds
 
@@ -72,56 +69,3 @@ class OCR:
             return correct, len(y_true)
         else:
             return correct / len(y_true)
-
-    def get_number(self, rois: np.array, class_ids: np.array) -> str:
-        centroids = []
-        for i in range(len(rois)):
-            y1, x1, y2, x2 = rois[i]
-            centroid = ((x1 + x2) // 2, (y1 + y2) // 2)
-            class_id = class_ids[i]
-            if class_id == 10:
-                class_id = 0
-            centroids.append((centroid, str(class_id)))
-        centroids.sort()
-        number = ''.join([s[1] for s in centroids])
-        return number
-
-class PlatesDetector:
-    def __init__(self, name: str = 'train_number_plates', num_classes: int = 1, image_min_dim: int = 128, image_max_dim: int = 1024):
-        self.config = ModelConfig(name=name,
-                                  num_classes=num_classes,
-                                  image_min_dim=image_min_dim,
-                                  image_max_dim=image_max_dim,
-                                  steps=120)
-
-    def predict(self, pictures: Union[DigitDataset, List[np.ndarray]],
-                weights_path: str = paths.WEIGHTS_PATH + 'our/final_20.h5') -> List[str]:
-        model = modellib.MaskRCNN(mode="inference", config=self.config, model_dir=paths.WEIGHT_LOGS_PATH)
-        model.load_weights(weights_path, by_name=True)
-
-        preds = []
-        for pic in pictures:
-            image = pic
-            results = model.detect([image], verbose=0)
-            r = results[0]
-            ids = ['BG'] + [str(i) for i in range(1, 11)]
-            visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ids,
-                                        r['scores'])
-
-            number = self.get_number(r['rois'], r['class_ids'], r['class_ids'], r['masks'])
-            preds.append(number)
-        return preds
-
-    def score(self, x: Union[DigitDataset, List[np.ndarray]], y_true: List[str],
-              quotient: bool = True) -> Union[float, Tuple[int, int]]:
-        y_predicted = self.predict(x)
-        correct = 0
-        for i in range(len(y_true)):
-            if y_true[i] == y_predicted[i]:
-                correct += 1
-        if quotient:
-            return correct, len(y_true)
-        else:
-            return correct / len(y_true)
-
-

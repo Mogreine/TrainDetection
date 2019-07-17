@@ -10,6 +10,8 @@ from mrcnn.model import MaskRCNN
 from mrcnn import visualize
 from src.utils.all_paths import Paths
 from typing import List
+from src.datasets.Datasets import PlateDataset
+from src.models.OCR import OCR
 
 paths = Paths('../')
 
@@ -24,88 +26,6 @@ class PlateConfig(Config):
     IMAGE_MIN_DIM = 128
     IMAGE_MAX_DIM = 1024
     DETECTION_MIN_CONFIDENCE = 0.9
-
-
-class PlateDataset(utils.Dataset):
-    def load_plates(self, dataset_dir: str, subset: str, annotations_path: str):
-        self.add_class("train_number_plates", 1, "train_number_plates")
-        # assert subset in ["train", "val"]
-        dataset_dir = os.path.join(dataset_dir, subset)
-        annotations = json.load(open(annotations_path))
-        annotations = list(annotations.values())  # don't need the dict keys
-        annotations = [a for a in annotations if a['regions']]
-
-        for a in annotations:
-            if type(a['regions']) is dict:
-                polygons = [r['shape_attributes'] for r in a['regions'].values()]
-            else:
-                polygons = [r['shape_attributes'] for r in a['regions']]
-            image_path = os.path.join(dataset_dir, a['filename'])
-            image = skimage.io.imread(image_path)
-            height, width = image.shape[:2]
-
-            self.add_image(
-                "train_number_plates",
-                image_id=a['filename'],
-                path=image_path,
-                width=width, height=height,
-                polygons=polygons)
-
-    def load_mask(self, image_id: int) -> (np.ndarray, np.ndarray):
-        image_info = self.image_info[image_id]
-        if image_info["source"] != "train_number_plates":
-            return super(self.__class__, self).load_mask(image_id)
-
-        info = self.image_info[image_id]
-        # print(info)
-        mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
-                        dtype=np.uint8)
-        for i, p in enumerate(info["polygons"]):
-            # Get indexes of pixels inside the polygon and set them to 1
-            # print("load_MASK DATA:")
-            # print(i, p)
-            if p['name'] == 'polygon':
-                rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
-            else:
-                rr, cc = skimage.draw.rectangle((p['y'], p['x']), (p['y'] + p['height'], p['x'] + p['width']))
-            mask[rr, cc, i] = 1
-            # print(mask[rr, cc, i])
-        return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
-
-    def image_reference(self, image_id: int):
-        info = self.image_info[image_id]
-        if info["source"] == "train_number_plates":
-            return info["path"]
-        else:
-            super(self.__class__, self).image_reference(image_id)
-
-
-def train(model: MaskRCNN, path_to_dataset: str = paths.IMAGES_PATH) -> None:
-    # Training dataset
-    dataset_train = PlateDataset()
-    dataset_train.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/ann.json")
-    dataset_train.prepare()
-
-    # Validation dataset
-    dataset_val = PlateDataset()
-    dataset_val.load_plates(path_to_dataset, "all_pics_aug/", path_to_dataset + "all_pics_aug/hundred.json")
-    dataset_val.prepare()
-
-    print("Training network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=EPOCHS_NUMBER,
-                layers='heads')
-
-
-def test_on_pics(model: MaskRCNN, path_to_pics: str, pics: List[str]) -> None:
-    for pic in pics:
-        image = skimage.io.imread(os.path.join(path_to_pics, pic))
-        results = model.detect([image], verbose=1)
-        r = results[0]
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], ['BG', 'train_number_plates'],
-                                    r['scores'])
-
 
 if __name__ == "__main__":
     MODE = "eval"  # eval or train
@@ -131,3 +51,24 @@ if __name__ == "__main__":
         model.load_weights(weights_path, by_name=True)
         test_on_pics(model, paths.IMAGES_PATH + "all_pics/",
                      ["61322186.jpg", "73372633.jpg", '52026226.jpg', '54096987.jpg'])
+
+if __name__ == "__main__":
+    MODE = "eval"  # eval or train
+    assert MODE in ["eval", "train"]
+    if MODE == "train":
+        train_ds = PlateDataset(dataset_dir=paths.IMAGES_PATH + 'all_pics_aug', annotations_name='ann.json')
+        val_ds = PlateDataset(dataset_dir=paths.IMAGES_PATH + 'all_pics_aug', annotations_name='hundred.json')
+        ocr = OCR(image_min_dim=128, image_max_dim=1024)
+        ocr.fit(train_ds, val_ds, epochs=20)
+    else:
+        numbers_path = paths.IMAGES_PATH + 'numbers/'
+        files = os.listdir(numbers_path)
+        images = [skimage.io.imread(numbers_path + file_name)
+                  for file_name in files if file_name[len(file_name) - 3:] == 'jpg']
+        ocr = OCR()
+
+        true_numbers = [file[2:-4] for file in files]
+        for i in range(len(true_numbers)):
+            true_numbers[i] = ''.join([j for j in true_numbers[i] if 48 <= ord(j) <= 57])
+        score = ocr.score(images, true_numbers)
+        print(score)
