@@ -18,6 +18,7 @@ class OCR:
                                   image_min_dim=image_min_dim,
                                   image_max_dim=image_max_dim,
                                   steps=120)
+        self.config.IMAGE_META_SIZE = 23
 
     def fit(self, train_dataset: DigitDataset, val_dataset: DigitDataset,
             epochs: int = 20, layers: str = 'heads', logs_path: str = paths.WEIGHT_LOGS_PATH,
